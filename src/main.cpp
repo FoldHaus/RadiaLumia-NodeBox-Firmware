@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <AccelStepper.h>
 
 const int VariablePin       = A3;
