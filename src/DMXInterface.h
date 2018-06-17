@@ -72,6 +72,9 @@ public:
 
     incoming.reserveNewestBufferForReading();
 
+    // HACK: This line skips the CRC check
+    return true;
+
     return (incoming.getReadBuffer()->checkCRC() == 0);
   }
 
