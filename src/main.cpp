@@ -1,16 +1,16 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 
-const int VariablePin       = A3;
-const int EnablePin         = 5;  // ClearPath ENABLE;
-const int DirectionPin      = 4;  // ClearPath Input A (DIRECTION);
-const int StepPin           = 3;  // ClearPath Input B (STEP);
-const int maxRPM            = 2500; 
-const int maxAccel          = 4000;
-const int maxTravelInches   = 28;
-const int countsPerRotation = 200; //must be set to this in the Clearpath firmware
-const int rotationsPerInch  = 4;  //must be set per lead screw pitch
-const int maxCounts         = maxTravelInches * countsPerRotation * rotationsPerInch;
+constexpr int VariablePin       = A3;
+constexpr int EnablePin         = 5;  // ClearPath ENABLE;
+constexpr int DirectionPin      = 4;  // ClearPath Input A (DIRECTION);
+constexpr int StepPin           = 3;  // ClearPath Input B (STEP);
+constexpr int maxRPM            = 2500;
+constexpr int maxAccel          = 4000;
+constexpr int maxTravelInches   = 28;
+constexpr int countsPerRotation = 200; //must be set to this in the Clearpath firmware
+constexpr int rotationsPerInch  = 4;  //must be set per lead screw pitch
+constexpr int maxCounts         = maxTravelInches * countsPerRotation * rotationsPerInch;
 
 int Enabled                               = false;
 int currentCount                          = 0;
