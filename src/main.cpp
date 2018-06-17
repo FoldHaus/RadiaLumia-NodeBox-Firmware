@@ -1,10 +1,18 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 
+#include "DMXInterface.h"
+
+using namespace Foldhaus;
+
 constexpr int VariablePin       = A3;
+
+constexpr int RS485RxEnable     = -1; // TODO: set this correctly
+
 constexpr int EnablePin         = 5;  // ClearPath ENABLE;
 constexpr int DirectionPin      = 4;  // ClearPath Input A (DIRECTION);
 constexpr int StepPin           = 3;  // ClearPath Input B (STEP);
+
 constexpr int maxRPM            = 2500;
 constexpr int maxAccel          = 4000;
 constexpr int maxTravelInches   = 28;
@@ -16,6 +24,9 @@ int Enabled                               = false;
 int currentCount                          = 0;
 int requestedCount                        = 0;
 int dmxRequestedPosition                  = 0;
+
+// const char endl[] PROGMEM = "\n";
+constexpr char endl = '\n';
 
 AccelStepper stepper1(AccelStepper::DRIVER, StepPin, DirectionPin);
 
@@ -32,20 +43,22 @@ void disableServo() {
 }
 
 void setup()
-{  
+{
   pinMode(EnablePin, OUTPUT);
   disableServo();
   digitalWrite(DirectionPin, LOW);
   digitalWrite(StepPin, LOW);
   delay(400); // Just give things a chance to settle in before enabling motor;
-  
-  //Serial.begin(115200);
+
   stepper1.setMaxSpeed((maxRPM/60)*countsPerRotation);
   stepper1.setAcceleration(maxAccel);
   stepper1.setPinsInverted(true, false, false);
   enableServo();
-}
 
+  DMXInterface::init();
+
+  DMXInterface::debug << PSTR("Init complete") << endl;
+}
 
 
 int positionToCount(int inputPosition) {
@@ -66,9 +79,17 @@ void getRequestedPosition() {
 }
 
 void loop() {
-  if (millis() % 20 == 0) {
-    getRequestedPosition();
-    stepper1.moveTo(requestedCount);
+
+  if (auto msg = DMXInterface::getMessage()) {
+    auto position = msg->getCommand();
+
+    stepper1.moveTo(position);
   }
-  stepper1.run();  
+
+  // if (millis() % 20 == 0) {
+  //   getRequestedPosition();
+  //   stepper1.moveTo(requestedCount);
+  // }
+
+  stepper1.run();
 }
