@@ -82,10 +82,17 @@ void getRequestedPosition() {
 
 void loop() {
 
+  static long lastPosition = 0x7fffffffL;
+
   if (auto msg = DMXInterface::getMessage()) {
     auto position = msg->getCommand();
 
     stepper1.moveTo(position);
+
+    if (position != lastPosition) {
+      DMXInterface::debug << PSTR("Moving to: ") << position << endl;
+      lastPosition = position;
+    }
   }
 
   // if (millis() % 20 == 0) {
