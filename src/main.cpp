@@ -72,10 +72,12 @@ void getRequestedPosition() {
   dmxRequestedPosition = variablePercentage * 256;
   ////////////////////////////////////////////////////////////////////////////////////////////////
   requestedCount = positionToCount(dmxRequestedPosition);
-  //Serial.print("requestedCount: ");
-  //Serial.print(requestedCount);
-  //Serial.print("   currentPosition: ");
-  //Serial.println(stepper1.currentPosition());
+  DMXInterface::debug
+    << PSTR("requestedCount: ")
+    << requestedCount
+    << PSTR("\t currentPosition: ")
+    << stepper1.currentPosition()
+    << endl;
 }
 
 void loop() {
