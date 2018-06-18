@@ -50,6 +50,11 @@ void setup()
   
   pinMode(RS485RxEnable, OUTPUT);
   digitalWrite(RS485RxEnable, LOW);
+  
+  DMXInterface::init();
+
+  // DMXInterface::debug << PSTR("Setup") << endl;
+  
   pinMode(EnablePin, OUTPUT);
   disableServo();
   digitalWrite(DirectionPin, LOW);
@@ -60,8 +65,6 @@ void setup()
   stepper1.setAcceleration(maxAccel);
   stepper1.setPinsInverted(true, false, false);
   enableServo();
-
-  DMXInterface::init();
 
   DMXInterface::debug << PSTR("Init complete") << endl;
 }
