@@ -114,6 +114,10 @@ void loop() {
   //   getRequestedPosition();
   //   stepper1.moveTo(requestedCount);
   // }
+  
+  // if (millis() % 1000 == 0) {
+  //   DMXInterface::debug << PSTR("Hello") << millis() << endl;
+  // }
 
   stepper1.run();
 }
