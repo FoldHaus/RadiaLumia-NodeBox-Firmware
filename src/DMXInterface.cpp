@@ -73,8 +73,14 @@ void DMXInterface::receiveByte() {
     return;
   }
 
-  // If we get a frame error (or data overrun) during the normal course of operation, reset
-  if ((status & (1 << FE0 | 1 << DOR0))) {
+  // If we get a frame error during the normal course of operation, new packet!
+  if (channel > 24 && status & 1 << FE0) {
+    channel = -1;
+    return;
+  }
+
+  // If we get a data overrun (or frame error too early) wait for another start of DMX packet
+  if (status & (1 << FE0 | 1 << DOR0)) {
     channel = -2;
     return;
   }
