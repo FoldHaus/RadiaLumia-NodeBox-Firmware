@@ -99,7 +99,7 @@ void loop() {
   static long lastPosition = 0x7fffffffL;
 
   if (auto msg = DMXInterface::getMessage()) {
-    DMXInterface::debug << PSTR("Message!") << endl;
+    // DMXInterface::debug << PSTR("Message!") << endl;
     auto position = msg->getCommand();
 
     stepper1.moveTo(position);
