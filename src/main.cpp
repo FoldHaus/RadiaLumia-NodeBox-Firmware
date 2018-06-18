@@ -47,6 +47,9 @@ void disableServo() {
 
 void setup()
 {
+  
+  pinMode(RS485RxEnable, OUTPUT);
+  digitalWrite(RS485RxEnable, LOW);
   pinMode(EnablePin, OUTPUT);
   disableServo();
   digitalWrite(DirectionPin, LOW);
