@@ -35,7 +35,8 @@ void DMXInterface::init() {
   // Enable transmitter, receiver, and rx interrupt
   UCSR0B = (1 << TXEN0) | (1 << RXEN0) | (1 << RXCIE0);
 
-  // TODO: enable Tx output. Or is it needed? I always forget
+  // Enable Tx output
+  DDRD |= 0b10;
 
   // Enable interrupts
   sei();
