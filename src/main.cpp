@@ -28,7 +28,7 @@ int currentCount                          = 0;
 int requestedCount                        = 0;
 int dmxRequestedPosition                  = 0;
 
-// const char endl[] PROGMEM = "\n";
+// const char endl[] PROGMEM = "\r\n";
 constexpr char endl = '\n';
 
 AccelStepper stepper1(AccelStepper::DRIVER, StepPin, DirectionPin);
