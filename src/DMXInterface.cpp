@@ -15,7 +15,7 @@ DecPrintFormatter DMXInterface::debug(&DMXInterface::sendByte);
 
 static CRC8 CRC;
 
-void USART0_RX_vect() {
+void USART_RX_vect() {
   DMXInterface::receiveByte();
 }
 

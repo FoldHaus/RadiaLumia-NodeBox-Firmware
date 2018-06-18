@@ -10,7 +10,7 @@
 #include <CRC8.h>
 #include <DecPrintFormatter.h>
 
-ISR(USART0_RX_vect);
+ISR(USART_RX_vect);
 
 namespace Foldhaus {
 
@@ -26,7 +26,7 @@ using namespace libCameron;
 class DMXInterface {
   static constexpr unsigned int dmxOffset = 0;
 
-  friend void ::USART0_RX_vect();
+  friend void ::USART_RX_vect();
   inline static void receiveByte() __attribute__((always_inline, hot));
 public:
   static void init();
