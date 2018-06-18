@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 
+#include "Board.h"
+
 #include "DMXInterface.h"
 
 using namespace Foldhaus;
@@ -47,6 +49,9 @@ void disableServo() {
 
 void setup()
 {
+  // Initialize blip
+  DebugPin::on();
+  DebugPin::off();
   
   pinMode(RS485RxEnable, OUTPUT);
   digitalWrite(RS485RxEnable, LOW);

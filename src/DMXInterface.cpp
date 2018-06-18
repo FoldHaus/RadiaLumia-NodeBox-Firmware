@@ -2,6 +2,8 @@
 #include "DMXInterface.h"
 #include "Arduino.h"
 
+#include "Board.h"
+
 #include <avr/io.h>
 
 #include <CRC8.h>
@@ -16,7 +18,10 @@ DecPrintFormatter DMXInterface::debug(&DMXInterface::sendByte);
 static CRC8 CRC;
 
 void USART_RX_vect() {
+  // DebugPin goes on during interrupt handing to easily see visual timing of interrupt servicing
+  DebugPin::on();
   DMXInterface::receiveByte();
+  DebugPin::off();
 }
 
 void DMXInterface::init() {
