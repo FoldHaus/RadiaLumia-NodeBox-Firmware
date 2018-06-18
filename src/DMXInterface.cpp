@@ -48,26 +48,46 @@ void DMXInterface::init() {
 }
 
 void DMXInterface::receiveByte() {
-  // -2 : init - lastSeen is invalid
-  // -1 : wait - Waiting for correct gap
-  // Otherwise current channel number
-  static int channel = -2;
+  // -3 : Init
+  // -2 : Wait - Byte seen. Waiting for frame error which indicates a "break".
+  // -1 : Packet Start Byte
+  // Otherwise current channel number. 0 is first channel. 511 is last channel
+  static int channel = -3;
+  
+  // UCSRnA must be read before UDRn or data is invalid
+  const uint8_t status = UCSR0A;
+  const uint8_t incomingByte = UDR0;
+  
+  if (channel == -3) {
+    // Seen our first byte, so mark it
+    channel = -2;
+    return;
+  }
+  
+  // If we're waiting for frame error that marks start of packet
+  if (channel == -2) {
+    // Check for "break"
+    if ((status & (1 << FE0)) && incomingByte == 0) {
+      channel = -1;
+    }
+    return;
+  }
 
-  // If frame error, that's the start of a DMX512 packet
-  if (UCSR0A & (1 << FE0) && UDR0 == 0) {
-    channel = -1;
+  // If we get a frame error (or data overrun) during the normal course of operation, reset
+  if ((status & (1 << FE0 | 1 << DOR0))) {
+    channel = -2;
     return;
   }
 
   // DMX packet type. Always 0
   if (channel == -1) {
-    if (UDR0 != 0) {
-      channel = -2;
-    }
+    channel = incomingByte ? -2 : 0;
     return;
   }
 
-  incoming.getWriteBuffer()->feed(++channel, UDR0);
+  incoming.getWriteBuffer()->feed(channel, incomingByte);
+  
+  channel++;
 }
 
 void DMXInterface::Message::feed(uint16_t channel, uint8_t b) {
