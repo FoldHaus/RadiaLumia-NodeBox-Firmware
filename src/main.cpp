@@ -22,8 +22,8 @@ constexpr int StepPin           = A2; // PC2
 
 constexpr int Feedback          = A5; // PC5
 
-constexpr int maxRPM            = 2500;
-constexpr int maxAccel          = 4000;
+constexpr int maxRPM            = 4000;
+constexpr int maxAccel          = 8000;
 constexpr int maxTravelInches   = 28;
 constexpr int countsPerRotation = 200; //must be set to this in the Clearpath firmware
 constexpr int rotationsPerInch  = 4;  //must be set per lead screw pitch
@@ -43,7 +43,7 @@ void enableServo() {
   digitalWrite(EnablePin, HIGH);
   stepper1.setCurrentPosition(0);
   Enabled = true;
-  delay(6000);
+  // delay(6000);
 }
 
 void disableServo() {
@@ -57,21 +57,39 @@ void setup()
   DebugPin::on();
   DebugPin::off();
   
+  pinMode(PinSpot, OUTPUT);
+  digitalWrite(PinSpot, LOW);
+  
   pinMode(RS485RxEnable, OUTPUT);
   digitalWrite(RS485RxEnable, LOW);
   
   DMXInterface::init();
 
-  // DMXInterface::debug << PSTR("Setup") << endl;
+  DMXInterface::debug << PSTR("Setup") << endl;
   
   pinMode(EnablePin, OUTPUT);
+  pinMode(DirectionPin, OUTPUT);
+  pinMode(StepPin, OUTPUT);
+  
+  // while (1) {
+  //     delay(1000);
+  //     digitalWrite(EnablePin, HIGH);
+  //     digitalWrite(DirectionPin, HIGH);
+  //     digitalWrite(StepPin, HIGH);
+  //     delay(1000);
+  //     digitalWrite(EnablePin, LOW);
+  //     digitalWrite(DirectionPin, LOW);
+  //     digitalWrite(StepPin, LOW);
+  // }
+  
   disableServo();
   digitalWrite(DirectionPin, LOW);
   digitalWrite(StepPin, LOW);
+  
+  
   delay(400); // Just give things a chance to settle in before enabling motor;
 
   stepper1.setMaxSpeed((maxRPM/60)*countsPerRotation);
-  stepper1.setAcceleration(maxAccel);
   stepper1.setPinsInverted(true, false, false);
   enableServo();
 
@@ -98,26 +116,53 @@ void getRequestedPosition() {
     << endl;
 }
 
-void loop() {
+void testSteps() {
+  static unsigned long nextStep = 0;
+  static bool toggle = false;
 
+  const unsigned long now = millis();
+
+  if (now < nextStep) return;
+  
+  nextStep += 10000;
+  if (nextStep < now) {
+    nextStep = now + 1000;
+  }
+  
+  const long next = toggle ? 0 : 10000;
+  
+  toggle = !toggle;
+  
+  DMXInterface::debug << PSTR("Moving to: ") << next << endl;
+  stepper1.runToNewPosition(next);
+}
+
+void handleMessage() {
   static long lastPosition = 0x7fffffffL;
 
   if (auto msg = DMXInterface::getMessage()) {
     // DMXInterface::debug << PSTR("Message!") << endl;
     auto position = msg->getCommand();
 
-    stepper1.moveTo(position);
+    // stepper1.moveTo(position);
 
     if (position != lastPosition) {
       DMXInterface::debug << PSTR("Moving to: ") << position << endl;
       lastPosition = position;
     }
   }
+}
 
-  // if (millis() % 20 == 0) {
-  //   getRequestedPosition();
-  //   stepper1.moveTo(requestedCount);
-  // }
+
+
+void loop() {
+  // handleMessage();
+  
+  
+  // testSteps();
+
+  
+  // digitalWrite(PinSpot, millis() % 1000 < 100 ? HIGH : LOW);
   
   // if (millis() % 1000 == 0) {
   //   DMXInterface::debug << PSTR("Hello") << millis() << endl;
