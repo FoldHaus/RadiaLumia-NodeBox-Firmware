@@ -18,6 +18,8 @@ constexpr int DirectionPin      = 9; // PB1
 // ClearPath Input B (STEP);
 constexpr int StepPin           = 8; // PB0
 
+constexpr int Feedback          = 7; // PD7
+
 constexpr int maxRPM            = 2500;
 constexpr int maxAccel          = 4000;
 constexpr int maxTravelInches   = 28;
