@@ -11,6 +11,8 @@ constexpr int VariablePin       = A3;
 
 constexpr int RS485RxEnable     = 4; // PD4
 
+constexpr int PinSpot = 6; // PD6
+
 // ClearPath ENABLE;
 constexpr int EnablePin         = 10; // PB2
 // ClearPath Input A (DIRECTION);
