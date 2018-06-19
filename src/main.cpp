@@ -11,16 +11,16 @@ constexpr int VariablePin       = A3;
 
 constexpr int RS485RxEnable     = 4; // PD4
 
-constexpr int PinSpot = 6; // PD6
+constexpr int PinSpot = 2; // PD2
 
 // ClearPath ENABLE;
 constexpr int EnablePin         = 10; // PB2
 // ClearPath Input A (DIRECTION);
 constexpr int DirectionPin      = 9; // PB1
 // ClearPath Input B (STEP);
-constexpr int StepPin           = 8; // PB0
+constexpr int StepPin           = A2; // PC2
 
-constexpr int Feedback          = 7; // PD7
+constexpr int Feedback          = A5; // PC5
 
 constexpr int maxRPM            = 2500;
 constexpr int maxAccel          = 4000;
