@@ -121,7 +121,6 @@ void handleMessage() {
   static long lastPosition = 0x7fffffffL;
 
   if (auto msg = DMXInterface::getMessage()) {
-    // DMXInterface::debug << PSTR("Message!") << endl;
     auto position = msg->getCommand();
 
     X.move(position);
