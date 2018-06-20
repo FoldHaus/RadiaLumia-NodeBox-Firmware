@@ -54,8 +54,6 @@ boolean _flag=false;						//This is the flag to show when to finish pulsing the 
 // It asks each motor how many steps to send, and then pulses to PORTB
 ISR(TIMER2_COMPA_vect)
 {  
-	//Prevent Interupts
-	cli();
 
 //Turn on pin 2 to see how long the ISR takes
 //  digitalWrite(2,HIGH);
@@ -116,7 +114,6 @@ PORTB = _OutputBits;			//Write to the ports
 //turn off debug pin
 //digitalWrite(2,LOW);
 //allow interupts
-sei();
 
 }
 
