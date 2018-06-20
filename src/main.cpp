@@ -138,7 +138,7 @@ void loop() {
   // handleMessage();
   
   
-  testSteps();
+  // testSteps();
 
   
   digitalWrite(PinSpot, millis() % 3000 < 250 ? HIGH : LOW);
