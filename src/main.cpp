@@ -135,7 +135,7 @@ void handleMessage() {
 
 
 void loop() {
-  // handleMessage();
+  handleMessage();
   
   
   // testSteps();
