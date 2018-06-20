@@ -1,5 +1,6 @@
 #include <Arduino.h>
-#include <AccelStepper.h>
+#include <ClearPathMotorSD.h>
+#include <ClearPathStepGen.h>
 
 #include "Board.h"
 
@@ -18,7 +19,7 @@ constexpr int EnablePin         = 10; // PB2
 // ClearPath Input A (DIRECTION);
 constexpr int DirectionPin      = 9; // PB1
 // ClearPath Input B (STEP);
-constexpr int StepPin           = A2; // PC2
+constexpr int StepPin           = 11; // PB3
 
 constexpr int Feedback          = A5; // PC5
 
@@ -37,19 +38,11 @@ int dmxRequestedPosition                  = 0;
 // const char endl[] PROGMEM = "\r\n";
 constexpr char endl = '\n';
 
-AccelStepper stepper1(AccelStepper::DRIVER, StepPin, DirectionPin);
+ClearPathMotorSD X;
 
-void enableServo() {
-  digitalWrite(EnablePin, HIGH);
-  stepper1.setCurrentPosition(0);
-  Enabled = true;
-  // delay(6000);
-}
+//initialize the controller and pass the reference to the motor we are controlling
+ClearPathStepGen machine(&X);
 
-void disableServo() {
-  digitalWrite(EnablePin, LOW);
-  Enabled = false;
-}
 
 void setup()
 {
@@ -67,31 +60,22 @@ void setup()
 
   DMXInterface::debug << PSTR("Setup") << endl;
   
-  pinMode(EnablePin, OUTPUT);
-  pinMode(DirectionPin, OUTPUT);
-  pinMode(StepPin, OUTPUT);
-  
-  // while (1) {
-  //     delay(1000);
-  //     digitalWrite(EnablePin, HIGH);
-  //     digitalWrite(DirectionPin, HIGH);
-  //     digitalWrite(StepPin, HIGH);
-  //     delay(1000);
-  //     digitalWrite(EnablePin, LOW);
-  //     digitalWrite(DirectionPin, LOW);
-  //     digitalWrite(StepPin, LOW);
-  // }
-  
-  disableServo();
-  digitalWrite(DirectionPin, LOW);
-  digitalWrite(StepPin, LOW);
-  
-  
-  delay(400); // Just give things a chance to settle in before enabling motor;
+  X.attach(DirectionPin, StepPin, EnablePin, Feedback);          //Direction/A is pin 8, Step/B is pin 9, Enable is pin 6, HLFB is pin 4
 
-  stepper1.setMaxSpeed((maxRPM/60)*countsPerRotation);
-  stepper1.setPinsInverted(true, false, false);
-  enableServo();
+  // Set max Velocity.  Parameter can be between 2 and 100,000 steps/sec
+  X.setMaxVel(10000);
+    
+  // Set max Acceleration.  Parameter can be between 4000 and 2,000,000 steps/sec/sec
+  X.setMaxAccel(50000);
+    
+  // Enable motor, reset the motor position to 0
+  X.enable();
+
+  delay(100);
+
+  // Set up the ISR to constantly update motor position.  All motor(s) must be attached, and enabled before this function is called.
+  machine.Start();
+
 
   DMXInterface::debug << PSTR("Init complete") << endl;
 }
@@ -108,33 +92,28 @@ void getRequestedPosition() {
   dmxRequestedPosition = variablePercentage * 256;
   ////////////////////////////////////////////////////////////////////////////////////////////////
   requestedCount = positionToCount(dmxRequestedPosition);
-  DMXInterface::debug
-    << PSTR("requestedCount: ")
-    << requestedCount
-    << PSTR("\t currentPosition: ")
-    << stepper1.currentPosition()
-    << endl;
+  // DMXInterface::debug
+  //   << PSTR("requestedCount: ")
+  //   << requestedCount
+  //   << PSTR("\t currentPosition: ")
+  //   << stepper1.currentPosition()
+  //   << endl;
 }
 
 void testSteps() {
-  static unsigned long nextStep = 0;
   static bool toggle = false;
-
-  const unsigned long now = millis();
-
-  if (now < nextStep) return;
-  
-  nextStep += 10000;
-  if (nextStep < now) {
-    nextStep = now + 1000;
-  }
-  
-  const long next = toggle ? 0 : 10000;
+  const long next = toggle ? -10000 : 10000;
   
   toggle = !toggle;
   
   DMXInterface::debug << PSTR("Moving to: ") << next << endl;
-  stepper1.runToNewPosition(next);
+  
+  X.move(next);
+  
+  // Wait for command to finish
+  while(!X.commandDone());
+  
+  delay(1000);
 }
 
 void handleMessage() {
@@ -159,7 +138,7 @@ void loop() {
   // handleMessage();
   
   
-  // testSteps();
+  testSteps();
 
   
   // digitalWrite(PinSpot, millis() % 1000 < 100 ? HIGH : LOW);
@@ -168,5 +147,4 @@ void loop() {
   //   DMXInterface::debug << PSTR("Hello") << millis() << endl;
   // }
 
-  stepper1.run();
 }
