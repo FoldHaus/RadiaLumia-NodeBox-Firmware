@@ -75,7 +75,8 @@ void setup()
 
   // Set up the ISR to constantly update motor position.  All motor(s) must be attached, and enabled before this function is called.
   machine.Start();
-
+  
+  delay(1000);
 
   DMXInterface::debug << PSTR("Init complete") << endl;
 }
