@@ -124,7 +124,7 @@ void handleMessage() {
     // DMXInterface::debug << PSTR("Message!") << endl;
     auto position = msg->getCommand();
 
-    // stepper1.moveTo(position);
+    X.move(position);
 
     if (position != lastPosition) {
       DMXInterface::debug << PSTR("Moving to: ") << position << endl;
