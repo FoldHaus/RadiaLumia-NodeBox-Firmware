@@ -8,11 +8,11 @@ namespace Board {
 
   using namespace AVR;
 
-  using DebugPin = Output<Ports::C, 0>;
+  using DebugLED = Output<Ports::D, 2, false, false>;
 
-  constexpr int VariablePin       = A3;
+  using DebugButton = Input<Ports::C, 0>;
 
-  constexpr int RS485RxEnable     = 4; // PD4
+  constexpr int RS485RxEnable     = A1; // PC1
 
   constexpr int PinSpot = 3; // PD3
 
@@ -21,9 +21,9 @@ namespace Board {
   // ClearPath Input A (DIRECTION);
   constexpr int DirectionPin      = 9; // PB1
   // ClearPath Input B (STEP);
-  constexpr int StepPin           = 11; // PB3
+  constexpr int StepPin           = 8; // PB0
 
-  constexpr int Feedback          = A5; // PC5
+  constexpr int Feedback          = 7; // PD7
 
 
 }

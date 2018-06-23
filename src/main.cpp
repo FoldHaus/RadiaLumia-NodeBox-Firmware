@@ -34,9 +34,8 @@ ClearPathStepGen machine(&X);
 void setup()
 {
   // Initialize blip
-  DebugPin::on();
-  DebugPin::off();
-  
+  DebugLED::on();
+
   pinMode(PinSpot, OUTPUT);
   digitalWrite(PinSpot, LOW);
   
@@ -66,6 +65,7 @@ void setup()
   delay(1000);
 
   DMXInterface::debug << PSTR("Init complete") << endl;
+  DebugLED::off();
 }
 
 
