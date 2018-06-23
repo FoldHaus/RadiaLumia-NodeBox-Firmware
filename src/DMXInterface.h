@@ -18,7 +18,7 @@ namespace Foldhaus {
  * Internal block of bytes we're wrapping around
  */
 typedef struct {
-  long command;
+  uint32_t command :24;
 } DMXDataShape;
 
 using namespace libCameron;
