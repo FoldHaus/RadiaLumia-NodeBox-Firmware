@@ -105,7 +105,7 @@ void testSteps() {
 }
 
 void handleMessage() {
-  static long lastPosition = 0x7fffffffL;
+  static unsigned long lastPosition = 0x7fffffffL;
 
   if (auto msg = DMXInterface::getMessage()) {
     auto position = msg->getCommand();
