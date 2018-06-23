@@ -10,6 +10,7 @@
 
 using namespace Foldhaus;
 using namespace libCameron;
+using namespace Board;
 
 libCameron::TripleBuffer<DMXInterface::Message, true> DMXInterface::incoming;
 
@@ -53,17 +54,17 @@ void DMXInterface::receiveByte() {
   // -1 : Packet Start Byte
   // Otherwise current channel number. 0 is first channel. 511 is last channel
   static int channel = -3;
-  
+
   // UCSRnA must be read before UDRn or data is invalid
   const uint8_t status = UCSR0A;
   const uint8_t incomingByte = UDR0;
-  
+
   if (channel == -3) {
     // Seen our first byte, so mark it
     channel = -2;
     return;
   }
-  
+
   // If we're waiting for frame error that marks start of packet
   if (channel == -2) {
     // Check for "break"
@@ -92,7 +93,7 @@ void DMXInterface::receiveByte() {
   }
 
   incoming.getWriteBuffer()->feed(channel, incomingByte);
-  
+
   channel++;
 }
 
