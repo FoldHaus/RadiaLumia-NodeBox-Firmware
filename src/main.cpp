@@ -138,8 +138,20 @@ bool handleMessage() {
 
 
 void loop() {
-  handleMessage();
-  
+  static unsigned long lastMessageTime = 0;
+  static bool timeout = true;
+
+  if (handleMessage()) {
+    lastMessageTime = millis();
+    timeout = false;
+  } else {
+    if (millis() - lastMessageTime >= 250) {
+      if (!timeout) {
+        DMXInterface::debug << PSTR("Timeout") << endl;
+        timeout = true;
+      }
+    }
+  }
   
   // testSteps();
 
