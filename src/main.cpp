@@ -155,9 +155,9 @@ void loop() {
   
   // testSteps();
 
-  
-  digitalWrite(PinSpot, millis() % 3000 < 250 ? HIGH : LOW);
-  
+
+  // digitalWrite(PinSpot, millis() % 3000 < 1000 ? HIGH : LOW);
+
   // if (millis() % 1000 == 0) {
   //   DMXInterface::debug << PSTR("Hello") << millis() << endl;
   // }
