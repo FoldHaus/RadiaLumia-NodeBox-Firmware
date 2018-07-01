@@ -33,19 +33,19 @@ ClearPathStepGen machine(&X);
 
 void setup()
 {
+  DMXInterface::init();
+  
+  DMXInterface::debug << PSTR("Setup") << endl;
   // Initialize blip
   DebugLED::on();
 
   pinMode(PinSpot, OUTPUT);
   digitalWrite(PinSpot, LOW);
-  
+
   pinMode(RS485RxEnable, OUTPUT);
   digitalWrite(RS485RxEnable, LOW);
-  
-  DMXInterface::init();
 
-  DMXInterface::debug << PSTR("Setup") << endl;
-  
+
   X.attach(DirectionPin, StepPin, EnablePin, Feedback);          //Direction/A is pin 8, Step/B is pin 9, Enable is pin 6, HLFB is pin 4
 
   // Set max Velocity.  Parameter can be between 2 and 100,000 steps/sec
