@@ -77,8 +77,8 @@ public:
 
     incoming.reserveNewestBufferForReading();
 
-    // HACK: This line skips the CRC check
-    return true;
+    // HACK: This line make sure the CRC is 0xAA
+    return incoming.getReadBuffer()->raw[sizeof(DMXDataShape)] == 0xAA;
 
     return (incoming.getReadBuffer()->checkCRC() == 0);
   }
