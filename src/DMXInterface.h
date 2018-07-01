@@ -57,7 +57,7 @@ public:
      */
     uint8_t checkCRC();
 
-    inline unsigned long getCommand() const {
+    inline typeof(data.command) getCommand() const {
       return data.command;
     }
   };
