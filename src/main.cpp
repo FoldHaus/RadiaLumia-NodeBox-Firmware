@@ -87,7 +87,7 @@ bool handleMessage() {
   if (!msg) return false;
 
   // DebugLED::on();
-  auto position = msg->getCommand();
+  unsigned long position = msg->getCommand();
   
   uint8_t ps = msg->getPinspot();
 
