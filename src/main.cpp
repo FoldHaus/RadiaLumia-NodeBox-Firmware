@@ -79,9 +79,27 @@ void testSteps() {
   delay(1000);
 }
 
-bool handleMessage() {
+long doMotor(unsigned long position) {
   static unsigned long lastPosition = 0;
 
+  if (position > maxCounts) {
+    position = maxCounts;
+  }
+  
+  const long delta = position - lastPosition;
+
+  if (X.move(delta)) {
+    lastPosition = position;
+  }
+
+  return delta;
+}
+
+void doPinspot(uint8_t ampl) {
+  digitalWrite(PinSpot, ampl ? HIGH : LOW);
+}
+
+bool handleMessage() {
   auto msg = DMXInterface::getMessage();
 
   if (!msg) return false;
@@ -91,29 +109,21 @@ bool handleMessage() {
   
   uint8_t ps = msg->getPinspot();
 
-  DMXInterface::debug << PSTR("Motor: ") << position << '\t' << PSTR("Spot: ") << ps;
+  DMXInterface::debug << PSTR("Motor: ") << position << PSTR("\tSpot: ") << ps;
 
-  if (position > maxCounts) {
-    position = maxCounts;
-  }
-  
-  // digitalWrite(PinSpot, ps ? HIGH : LOW);
-  
-  const long delta = position - lastPosition;
-
-  if (X.move(delta)) {
-    lastPosition = position;
-  }
+  auto delta = doMotor(position);
 
   if (delta) {
-    DMXInterface::debug << PSTR("\t moving: ") << delta;
+    DMXInterface::debug << PSTR("\tdelta: ") << delta;
   }
+
+  doPinspot(ps);
+
   DMXInterface::debug << endl;
   // DebugLED::off();
 
   return true;
 }
-
 
 
 void loop() {
