@@ -45,10 +45,10 @@ void setup()
 
   // Set max Velocity.  Parameter can be between 2 and 100,000 steps/sec
   X.setMaxVel(10000);
-    
+
   // Set max Acceleration.  Parameter can be between 4000 and 2,000,000 steps/sec/sec
   X.setMaxAccel(50000);
-    
+
   // Enable motor, reset the motor position to 0
   X.enable();
 
@@ -56,7 +56,7 @@ void setup()
 
   // Set up the ISR to constantly update motor position.  All motor(s) must be attached, and enabled before this function is called.
   machine.Start();
-  
+
   delay(1000);
 
   DMXInterface::debug << PSTR("Init complete") << endl;
@@ -66,16 +66,16 @@ void setup()
 void testSteps() {
   static bool toggle = false;
   const long next = toggle ? -10000 : 10000;
-  
+
   toggle = !toggle;
-  
+
   DMXInterface::debug << PSTR("Moving to: ") << next << endl;
-  
+
   X.move(next);
-  
+
   // Wait for command to finish
   while(!X.commandDone());
-  
+
   delay(1000);
 }
 
