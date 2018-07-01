@@ -17,11 +17,6 @@ constexpr int countsPerRotation = 200; //must be set to this in the Clearpath fi
 constexpr int rotationsPerInch  = 4;  //must be set per lead screw pitch
 constexpr int maxCounts         = maxTravelInches * countsPerRotation * rotationsPerInch;
 
-int Enabled                               = false;
-int currentCount                          = 0;
-int requestedCount                        = 0;
-int dmxRequestedPosition                  = 0;
-
 // const char endl[] PROGMEM = "\r\n";
 constexpr char endl = '\n';
 
@@ -66,26 +61,6 @@ void setup()
 
   DMXInterface::debug << PSTR("Init complete") << endl;
   DebugLED::off();
-}
-
-
-int positionToCount(int inputPosition) {
-  return (inputPosition * (maxCounts / 256));
-}
-
-void getRequestedPosition() {
-  // this next bit you shouldn't need if you can get a dmxRequestedPosition through another routine
-  int variableValue = 1023 - analogRead(VariablePin);
-  float variablePercentage = (variableValue / 1023.0);
-  dmxRequestedPosition = variablePercentage * 256;
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  requestedCount = positionToCount(dmxRequestedPosition);
-  // DMXInterface::debug
-  //   << PSTR("requestedCount: ")
-  //   << requestedCount
-  //   << PSTR("\t currentPosition: ")
-  //   << stepper1.currentPosition()
-  //   << endl;
 }
 
 void testSteps() {
