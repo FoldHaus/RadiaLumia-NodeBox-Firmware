@@ -10,12 +10,12 @@ using namespace Foldhaus;
 
 using namespace Board;
 
-constexpr int maxRPM            = 4000;
-constexpr int maxAccel          = 8000;
-constexpr int maxTravelInches   = 28;
-constexpr int countsPerRotation = 200; //must be set to this in the Clearpath firmware
-constexpr int rotationsPerInch  = 4;  //must be set per lead screw pitch
-constexpr int maxCounts         = maxTravelInches * countsPerRotation * rotationsPerInch;
+constexpr unsigned int maxRPM            = 4000;
+constexpr unsigned int maxAccel          = 8000;
+constexpr unsigned int maxTravelInches   = 28;
+constexpr unsigned int countsPerRotation = 200; //must be set to this in the Clearpath firmware
+constexpr unsigned int rotationsPerInch  = 4;  //must be set per lead screw pitch
+constexpr unsigned int maxCounts         = maxTravelInches * countsPerRotation * rotationsPerInch;
 
 // const char endl[] PROGMEM = "\r\n";
 constexpr char endl = '\n';
