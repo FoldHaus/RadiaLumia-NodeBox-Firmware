@@ -104,21 +104,35 @@ void testSteps() {
   delay(1000);
 }
 
-void handleMessage() {
+bool handleMessage() {
   static unsigned long lastPosition = 0;
 
-  if (auto msg = DMXInterface::getMessage()) {
-    DebugLED::on();
-    auto position = msg->getCommand();
+  auto msg = DMXInterface::getMessage();
 
-    X.move(position);
+  if (!msg) return false;
 
-    if (position != lastPosition) {
-      DMXInterface::debug << PSTR("Moving to: ") << position << endl;
-      lastPosition = position;
-    }
-    DebugLED::off();
+  // DebugLED::on();
+  auto position = msg->getCommand();
+  
+  uint8_t ps = msg->getPinspot();
+
+  DMXInterface::debug << PSTR("Motor: ") << position << '\t' << PSTR("Spot: ") << ps;
+  
+  // digitalWrite(PinSpot, ps ? HIGH : LOW);
+  
+  const long delta = position - lastPosition;
+
+  if (X.move(delta)) {
+    lastPosition = position;
   }
+
+  if (delta) {
+    DMXInterface::debug << PSTR("\t moving: ") << delta;
+  }
+  DMXInterface::debug << endl;
+  // DebugLED::off();
+
+  return true;
 }
 
 
