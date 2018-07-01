@@ -60,6 +60,10 @@ public:
     inline typeof(data.command) getCommand() const {
       return data.command;
     }
+
+    inline typeof(data.pinspot) getPinspot() const {
+      return data.pinspot;
+    }
   };
 
 private:
