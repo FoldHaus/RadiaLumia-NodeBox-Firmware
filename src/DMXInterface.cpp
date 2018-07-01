@@ -20,9 +20,9 @@ static CRC8 CRC;
 
 void USART_RX_vect() {
   // DebugPin goes on during interrupt handing to easily see visual timing of interrupt servicing
-  DebugPin::on();
+  // DebugPin::on();
   DMXInterface::receiveByte();
-  DebugPin::off();
+  // DebugPin::off();
 }
 
 void DMXInterface::init() {
