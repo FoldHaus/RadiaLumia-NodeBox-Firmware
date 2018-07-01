@@ -92,6 +92,10 @@ bool handleMessage() {
   uint8_t ps = msg->getPinspot();
 
   DMXInterface::debug << PSTR("Motor: ") << position << '\t' << PSTR("Spot: ") << ps;
+
+  if (position > maxCounts) {
+    position = maxCounts;
+  }
   
   // digitalWrite(PinSpot, ps ? HIGH : LOW);
   
