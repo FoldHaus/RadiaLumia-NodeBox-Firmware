@@ -105,7 +105,7 @@ void testSteps() {
 }
 
 void handleMessage() {
-  static unsigned long lastPosition = 0x7fffffffL;
+  static unsigned long lastPosition = 0;
 
   if (auto msg = DMXInterface::getMessage()) {
     DebugLED::on();
