@@ -140,6 +140,10 @@ void testPinSpot() {
   bool dir = testNum >> PinSpotAmplitudeBits & 1;
   testNum &= PinSpotAmplitudeMax;
   if (dir) testNum = PinSpotAmplitudeMax - testNum;
+
+  constexpr auto logMaxOverMax = log(PinSpotAmplitudeMax) / PinSpotAmplitudeMax;
+  if (testNum) testNum = round(exp(logMaxOverMax * testNum));
+
   handleNewPinSpotBrightness(testNum);
 }
 
