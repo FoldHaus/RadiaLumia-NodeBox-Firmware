@@ -47,7 +47,7 @@ void setup() {
   // Set max Acceleration.  Parameter can be between 4000 and 2,000,000 steps/sec/sec
   X.setMaxAccel(50000);
 
-  // Enable motor, reset the motor position to 0
+  // Enable motor
   X.enable();
 
   delay(100);
