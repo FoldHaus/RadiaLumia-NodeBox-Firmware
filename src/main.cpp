@@ -69,10 +69,14 @@ void testMotorSteps() {
 
   DMXInterface::debug << PSTR("Moving to: ") << next << endl;
 
+  DebugLED::on();
+
   X.move(next);
 
   // Wait for command to finish
   while(!X.commandDone());
+  
+  DebugLED::off();
 
   delay(1000);
 }
