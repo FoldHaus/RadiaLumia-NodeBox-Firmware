@@ -103,6 +103,10 @@ inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
   PinSpotAmplitude = ampl;
 }
 
+inline void loopDoPinSpot() {
+  digitalWrite(PinSpot, (micros() & PinSpotAmplitudeMax < PinSpotAmplitude) ? HIGH : LOW);
+}
+
 bool handleMessage() {
   auto msg = DMXInterface::getMessage();
 
@@ -150,7 +154,7 @@ void loop() {
     }
   }
 
-  digitalWrite(PinSpot, (micros() & PinSpotAmplitudeMax < PinSpotAmplitude) ? HIGH : LOW);
+  loopDoPinSpot();
   
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
