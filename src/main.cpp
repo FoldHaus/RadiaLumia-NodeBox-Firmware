@@ -163,11 +163,9 @@ void loop() {
     if (millis() - lastMessageTime >= 10 * 1000) {
       handleNewPinSpotBrightness(0);
     }
-    if (millis() - lastMessageTime >= 250) {
-      if (!timeout) {
-        DMXInterface::debug << PSTR("Timeout") << endl;
-        timeout = true;
-      }
+    if (!timeout && millis() - lastMessageTime >= 250) {
+      DMXInterface::debug << PSTR("Timeout") << endl;
+      timeout = true;
     }
   }
 
