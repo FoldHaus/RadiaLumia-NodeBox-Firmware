@@ -27,6 +27,8 @@ ClearPathStepGen machine(&X);
 
 
 void setup() {
+  // Initialize blip on LED
+  DebugLED::on();
 
   pinMode(RS485RxEnable, OUTPUT);
   digitalWrite(RS485RxEnable, LOW);
@@ -34,8 +36,6 @@ void setup() {
   DMXInterface::init();
   
   DMXInterface::debug << PSTR("Setup") << endl;
-  // Initialize blip
-  DebugLED::on();
 
   pinMode(PinSpot, OUTPUT);
   digitalWrite(PinSpot, LOW);
