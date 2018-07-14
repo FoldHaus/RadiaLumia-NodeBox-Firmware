@@ -26,8 +26,7 @@ ClearPathMotorSD X;
 ClearPathStepGen machine(&X);
 
 
-void setup()
-{
+void setup() {
   DMXInterface::init();
   
   DMXInterface::debug << PSTR("Setup") << endl;
