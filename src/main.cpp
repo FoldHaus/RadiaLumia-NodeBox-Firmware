@@ -39,7 +39,7 @@ void setup() {
 
   pinMode(PinSpot, OUTPUT);
   digitalWrite(PinSpot, LOW);
-  X.attach(DirectionPin, StepPin, EnablePin, Feedback);          //Direction/A is pin 8, Step/B is pin 9, Enable is pin 6, HLFB is pin 4
+  X.attach(DirectionPin, StepPin, EnablePin, Feedback);
 
   // Set max Velocity.  Parameter can be between 2 and 100,000 steps/sec
   X.setMaxVel(10000);
