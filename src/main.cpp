@@ -136,7 +136,11 @@ bool handleMessage() {
 }
 
 void testPinSpot() {
-  handleNewPinSpotBrightness(millis());
+  uint16_t testNum = millis();
+  bool dir = testNum >> PinSpotAmplitudeBits & 1;
+  testNum &= PinSpotAmplitudeMax;
+  if (dir) testNum = PinSpotAmplitudeMax - testNum;
+  handleNewPinSpotBrightness(testNum);
 }
 
 
