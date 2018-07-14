@@ -101,8 +101,8 @@ bool handleMessage() {
   auto msg = DMXInterface::getMessage();
 
   if (!msg) return false;
-
   // DebugLED::on();
+
   unsigned long position = msg->getCommand();
   
   uint8_t ps = msg->getPinspot();
@@ -118,8 +118,8 @@ bool handleMessage() {
   doPinspot(ps);
 
   DMXInterface::debug << endl;
-  // DebugLED::off();
 
+  // DebugLED::off();
   return true;
 }
 
