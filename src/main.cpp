@@ -133,8 +133,19 @@ inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
 }
 
 inline void loopDoPinSpot() {
-  // If sawtooth function is ever less than the current desired amplitude, turn on, otherwise off.
-  digitalWrite(PinSpot, (micros() & PinSpotAmplitudeMax) < PinSpotAmplitude ? HIGH : LOW);
+  digitalWrite(PinSpot,
+      // If we're max, really be full on and skip the micros() check
+      PinSpotAmplitude >= PinSpotAmplitudeMax
+      ||
+      // Use micros() to generate our base PWM sawtooth that we're comparing to
+      // If sawtooth function is ever less than the current desired amplitude, turn on, otherwise off.
+      // Therefore, if PinSpotAmplitude is 0, this does not turn on.
+      (micros() & PinSpotAmplitudeMax) < PinSpotAmplitude
+    ?
+      HIGH
+    :
+      LOW
+  );
 }
 
 bool handleMessage() {
