@@ -93,8 +93,14 @@ long doMotor(unsigned long position) {
   return delta;
 }
 
-void doPinspot(uint8_t ampl) {
-  digitalWrite(PinSpot, ampl ? HIGH : LOW);
+constexpr auto PinSpotAmplitudeMax = (1 << 12) - 1;
+uint16_t PinSpotAmplitude = 0;
+
+inline uint16_t doPinspot(uint16_t ampl) {
+  if (ampl > PinSpotAmplitudeMax) {
+    return PinSpotAmplitude = PinSpotAmplitudeMax;
+  }
+  PinSpotAmplitude = ampl;
 }
 
 bool handleMessage() {
@@ -142,6 +148,8 @@ void loop() {
       }
     }
   }
+
+  digitalWrite(PinSpot, (micros() & PinSpotAmplitudeMax < PinSpotAmplitude) ? HIGH : LOW);
   
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
