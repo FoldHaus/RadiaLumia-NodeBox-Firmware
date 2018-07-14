@@ -134,6 +134,10 @@ bool handleMessage() {
   return true;
 }
 
+void testPinSpot() {
+  handleNewPinSpotBrightness(millis());
+}
+
 
 void loop() {
   static unsigned long lastMessageTime = 0;
@@ -158,6 +162,7 @@ void loop() {
   
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
+  // testPinSpot();
   // testMotorSteps();
 
   // digitalWrite(PinSpot, millis() % 3000 < 1000 ? HIGH : LOW);
