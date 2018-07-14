@@ -77,7 +77,7 @@ void testSteps() {
   delay(1000);
 }
 
-long doMotor(unsigned long position) {
+long handleNewMotorPosition(unsigned long position) {
   static unsigned long lastPosition = 0;
 
   if (position > maxCounts) {
@@ -96,7 +96,7 @@ long doMotor(unsigned long position) {
 constexpr auto PinSpotAmplitudeMax = (1 << 12) - 1;
 uint16_t PinSpotAmplitude = 0;
 
-inline uint16_t doPinspot(uint16_t ampl) {
+inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
   if (ampl > PinSpotAmplitudeMax) {
     return PinSpotAmplitude = PinSpotAmplitudeMax;
   }
@@ -113,12 +113,12 @@ bool handleMessage() {
 
   DMXInterface::debug
     << PSTR("PSpot: ")
-    << doPinspot(msg->getPinspot())
+    << handleNewPinSpotBrightness(msg->getPinspot())
     << PSTR("\tMotor: ")
     << position
     ;
 
-  auto delta = doMotor(position);
+  auto delta = handleNewMotorPosition(position);
 
   if (delta) {
     DMXInterface::debug << PSTR("\tDelta: ") << delta;
@@ -140,7 +140,7 @@ void loop() {
     timeout = false;
   } else {
     if (millis() - lastMessageTime >= 10 * 1000) {
-      doPinspot(0);
+      handleNewPinSpotBrightness(0);
     }
     if (millis() - lastMessageTime >= 250) {
       if (!timeout) {
