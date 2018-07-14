@@ -110,18 +110,19 @@ bool handleMessage() {
   // DebugLED::on();
 
   unsigned long position = msg->getCommand();
-  
-  uint8_t ps = msg->getPinspot();
 
-  DMXInterface::debug << PSTR("Motor: ") << position << PSTR("\tSpot: ") << ps;
+  DMXInterface::debug
+    << PSTR("PSpot: ")
+    << doPinspot(msg->getPinspot())
+    << PSTR("\tMotor: ")
+    << position
+    ;
 
   auto delta = doMotor(position);
 
   if (delta) {
     DMXInterface::debug << PSTR("\tDelta: ") << delta;
   }
-
-  doPinspot(ps);
 
   DMXInterface::debug << endl;
 
