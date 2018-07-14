@@ -93,7 +93,8 @@ long handleNewMotorPosition(unsigned long position) {
   return delta;
 }
 
-constexpr auto PinSpotAmplitudeMax = (1 << 12) - 1;
+constexpr auto PinSpotAmplitudeBits = 12;
+constexpr auto PinSpotAmplitudeMax = (1 << PinSpotAmplitudeBits) - 1;
 uint16_t PinSpotAmplitude = 0;
 
 inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
