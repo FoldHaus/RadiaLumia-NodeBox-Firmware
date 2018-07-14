@@ -61,7 +61,7 @@ void setup() {
   DebugLED::off();
 }
 
-void testSteps() {
+void testMotorSteps() {
   static bool toggle = false;
   const long next = toggle ? -10000 : 10000;
 
@@ -158,9 +158,7 @@ void loop() {
   
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
-
-  // testSteps();
-
+  // testMotorSteps();
 
   // digitalWrite(PinSpot, millis() % 3000 < 1000 ? HIGH : LOW);
 
