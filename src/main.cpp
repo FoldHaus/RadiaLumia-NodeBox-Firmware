@@ -132,6 +132,9 @@ void loop() {
     lastMessageTime = millis();
     timeout = false;
   } else {
+    if (millis() - lastMessageTime >= 10 * 1000) {
+      doPinspot(0);
+    }
     if (millis() - lastMessageTime >= 250) {
       if (!timeout) {
         DMXInterface::debug << PSTR("Timeout") << endl;
