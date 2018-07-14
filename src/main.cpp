@@ -101,7 +101,7 @@ inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
   if (ampl > PinSpotAmplitudeMax) {
     return PinSpotAmplitude = PinSpotAmplitudeMax;
   }
-  PinSpotAmplitude = ampl;
+  return PinSpotAmplitude = ampl;
 }
 
 inline void loopDoPinSpot() {
