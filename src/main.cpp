@@ -105,7 +105,7 @@ inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
 }
 
 inline void loopDoPinSpot() {
-  digitalWrite(PinSpot, (micros() & PinSpotAmplitudeMax < PinSpotAmplitude) ? HIGH : LOW);
+  digitalWrite(PinSpot, (micros() & PinSpotAmplitudeMax) < PinSpotAmplitude ? HIGH : LOW);
 }
 
 bool handleMessage() {
