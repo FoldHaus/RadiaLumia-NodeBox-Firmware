@@ -112,7 +112,7 @@ bool handleMessage() {
   auto delta = doMotor(position);
 
   if (delta) {
-    DMXInterface::debug << PSTR("\tdelta: ") << delta;
+    DMXInterface::debug << PSTR("\tDelta: ") << delta;
   }
 
   doPinspot(ps);
