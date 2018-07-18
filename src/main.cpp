@@ -213,15 +213,18 @@ void loop() {
   static unsigned long lastMessageTime = 0;
   // Timeout flag defaults to on
   static bool timeout = true;
+  static bool off = true;
 
   // If we've just received a valid message, mark the time. No Timeout! Yay!
   if (handleMessage()) {
     lastMessageTime = millis();
     timeout = false;
+    off = false;
   } else {
     // If we've gone 10 seconds since a message, turn off pinspot
-    if (millis() - lastMessageTime >= 10 * 1000) {
+    if (!off && millis() - lastMessageTime >= 10 * 1000) {
       handleNewPinSpotBrightness(0);
+      off = true;
     }
     // If we've gone 0.25 seconds since a message, indicate timeout but don't spam
     if (!timeout && millis() - lastMessageTime >= 250) {
