@@ -183,9 +183,16 @@ void testPinSpot() {
   // At 12-bits it's about 4Hz
   uint16_t testNum = millis();
 
+  static bool prevDir = false;
   // Grab the next bit from the time to reverse the direction so we can generate
   // a triangle wave instead of a sawtooth
   bool dir = testNum >> PinSpotAmplitudeBits & 1;
+
+  if (dir != prevDir) {
+    DMXInterface::debug << (dir ? PSTR("Up") : PSTR("Down")) << endl;
+
+    prevDir = dir;
+  }
 
   // Get just the bits we want to test with
   testNum &= PinSpotAmplitudeMax;
