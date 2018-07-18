@@ -4,6 +4,8 @@
 
 #include "Board.h"
 
+#include "testPinSpot.h"
+
 #include "DMXInterface.h"
 
 using namespace Foldhaus;
@@ -201,9 +203,7 @@ void testPinSpot() {
   if (dir) testNum = PinSpotAmplitudeMax - testNum;
 
   // Do a logarithmic dimming of linear input time makes dimmer seem more natural
-  constexpr auto logMaxOverMax = log(PinSpotAmplitudeMax) / PinSpotAmplitudeMax;
-  // We also don't want a brightness of "1" when we actually want trully 0.
-  if (testNum) testNum = round(exp(logMaxOverMax * testNum));
+  testNum = curvePS(testNum);
 
   handleNewPinSpotBrightness(testNum);
 }
