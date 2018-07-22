@@ -1,6 +1,5 @@
 #include <Arduino.h>
-#include <ClearPathMotorSD.h>
-#include <ClearPathStepGen.h>
+#include <AccelStepper.h>
 
 #include "Board.h"
 
@@ -12,7 +11,7 @@ using namespace Foldhaus;
 
 using namespace Board;
 
-constexpr unsigned int maxRPM            = 4000;
+constexpr unsigned int maxRPM            = 2000;
 constexpr unsigned int maxAccel          = 8000;
 constexpr unsigned int maxTravelInches   = 28;
 constexpr unsigned int countsPerRotation = 200; //must be set to this in the Clearpath firmware
@@ -22,11 +21,21 @@ constexpr unsigned int maxCounts         = maxTravelInches * countsPerRotation *
 // const char endl[] PROGMEM = "\r\n";
 constexpr char endl = '\n';
 
-ClearPathMotorSD X;
+// Setup stepper, but don't initialize the outputs
+AccelStepper stepper1(AccelStepper::DRIVER, StepPin, DirectionPin, 0xff, 0xff, false);
 
-//initialize the controller and pass the reference to the motor we are controlling
-ClearPathStepGen machine(&X);
+void setupMotorWithAccelStepperLib() {
+  // Invert certain pins. Dir, Step, Enable
+  // Must set pin inversions before setEnable();
+  stepper1.setPinsInverted(false, false, false);
 
+  stepper1.setEnablePin(EnablePin);
+
+  stepper1.setMaxSpeed((maxRPM/60/8)*countsPerRotation);
+  stepper1.setAcceleration(maxAccel);
+
+  stepper1.enableOutputs();
+}
 
 void setup() {
   // Initialize blip on LED
@@ -46,24 +55,7 @@ void setup() {
   pinMode(PinSpot, OUTPUT);
   digitalWrite(PinSpot, LOW);
 
-  // Setup motor
-  X.attach(DirectionPin, StepPin, EnablePin, Feedback);
-
-  // Set max Velocity.  Parameter can be between 2 and 100,000 steps/sec
-  X.setMaxVel(10000);
-
-  // Set max Acceleration.  Parameter can be between 4000 and 2,000,000 steps/sec/sec
-  X.setMaxAccel(50000);
-
-  // Enable motor
-  X.enable();
-
-  // Delay a tad. Require before the "machine" is started (I think)
-  delay(100);
-
-  // Set up the ISR to constantly update motor position.
-  // All motor(s) must be attached and enabled before this function is called.
-  machine.Start();
+  setupMotorWithAccelStepperLib();
 
   // Delay some more for no real reason
   delay(1000);
@@ -75,24 +67,24 @@ void setup() {
   DebugLED::off();
 }
 
+long handleNewMotorPosition(unsigned long position);
+
 void testMotorSteps() {
   static bool toggle = false;
-  const long next = toggle ? -10000 : 10000;
+  static unsigned long lastTime = 0;
+
+  auto time = millis();
+
+  if (time - lastTime < 4000) return;
+  lastTime = time;
+
+  const long next = toggle ? 0 : 10000;
 
   toggle = !toggle;
 
   DMXInterface::debug << PSTR("Moving to: ") << next << endl;
 
-  DebugLED::on();
-
-  X.move(next);
-
-  // Wait for command to finish
-  while(!X.commandDone());
-  
-  DebugLED::off();
-
-  delay(1000);
+  handleNewMotorPosition(next);
 }
 
 long handleNewMotorPosition(unsigned long position) {
@@ -102,17 +94,10 @@ long handleNewMotorPosition(unsigned long position) {
   if (position > maxCounts) {
     position = maxCounts;
   }
+
+  stepper1.moveTo(position);
   
   const long delta = position - lastPosition;
-
-  // Our motor library only accepts delta commands
-  // It also only accepts commands if it is not still moving
-  // This probably needs to change
-  // Regardless, if it does not accept the delta, it tells us,
-  // and we need to only record the new position if it was accpected by the driver
-  if (X.move(delta)) {
-    lastPosition = position;
-  }
 
   return delta;
 }
@@ -235,12 +220,15 @@ void loop() {
 
   // Call the non-blocking pinspot main
   loopDoPinSpot();
+
+  // Call non-blocking stepper main
+  stepper1.run();
   
   // Test the motor's Feedback line
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
   // testPinSpot();
-  // testMotorSteps();
+  testMotorSteps();
 
   // Toggle the pinspot on and off
   // digitalWrite(PinSpot, millis() % 3000 < 1000 ? HIGH : LOW);
