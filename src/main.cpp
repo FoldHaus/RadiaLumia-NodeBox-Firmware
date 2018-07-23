@@ -11,6 +11,12 @@ using namespace Foldhaus;
 
 using namespace Board;
 
+namespace Debug {
+  namespace DMX {
+    constexpr bool Messages = false;
+  }
+}
+
 constexpr unsigned int maxRPM            = 2000;
 constexpr unsigned int maxAccel          = 8000;
 constexpr unsigned int maxTravelInches   = 28;
@@ -144,22 +150,27 @@ bool handleMessage() {
 
   unsigned long position = msg->getCommand();
 
-  DMXInterface::debug
-    << PSTR("PSpot: ")
-    << handleNewPinSpotBrightness(msg->getPinspot())
-    << PSTR("\tMotor: ")
-    << position
-    ;
+  if (Debug::DMX::Messages) {
+    DMXInterface::debug
+      << PSTR("PSpot: ")
+      << handleNewPinSpotBrightness(msg->getPinspot())
+      << PSTR("\tMotor: ")
+      << position
+      ;
+  }
 
   auto delta = handleNewMotorPosition(position);
 
   // Might as well only print deltas when they're non-zero
-  if (delta) {
+  if (Debug::DMX::Messages && delta) {
     DMXInterface::debug << PSTR("\tDelta: ") << delta;
   }
 
   // Don't forget to finish out output lines
-  DMXInterface::debug << endl;
+  
+  if (Debug::DMX::Messages) {
+    DMXInterface::debug << endl;
+  }
 
   // DebugLED::off();
   return true;
