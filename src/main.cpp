@@ -24,6 +24,14 @@ constexpr unsigned int countsPerRotation = 200; //must be set to this in the Cle
 constexpr unsigned int rotationsPerInch  = 4;  //must be set per lead screw pitch
 constexpr unsigned int maxCounts         = maxTravelInches * countsPerRotation * rotationsPerInch;
 
+enum class State : u1 {
+  Init,
+  Homing,
+  Normal,
+};
+
+State state = State::Init;
+
 // const char endl[] PROGMEM = "\r\n";
 constexpr char endl = '\n';
 
@@ -31,16 +39,13 @@ constexpr char endl = '\n';
 AccelStepper stepper1(AccelStepper::DRIVER, StepPin, DirectionPin, 0xff, 0xff, false);
 
 void setupMotorWithAccelStepperLib() {
-  // Invert certain pins. Dir, Step, Enable
-  // Must set pin inversions before setEnable();
-  stepper1.setPinsInverted(false, false, false);
+  digitalWrite(EnablePin, LOW);
+  pinMode(EnablePin, OUTPUT);
 
-  stepper1.setEnablePin(EnablePin);
+  stepper1.setPinsInverted(true, false, false);
 
   stepper1.setMaxSpeed((maxRPM/60/8)*countsPerRotation);
   stepper1.setAcceleration(maxAccel);
-
-  stepper1.enableOutputs();
 }
 
 void setup() {
@@ -216,6 +221,12 @@ void loop() {
     lastMessageTime = millis();
     timeout = false;
     off = false;
+
+    if (state == State::Init) {
+      state = State::Homing;
+      digitalWrite(EnablePin, HIGH);
+      DMXInterface::debug << PSTR("Homeing") << endl;
+    }
   } else {
     // If we've gone 10 seconds since a message, turn off pinspot
     if (!off && millis() - lastMessageTime >= 10 * 1000) {
@@ -227,6 +238,20 @@ void loop() {
       DMXInterface::debug << PSTR("Timeout") << endl;
       timeout = true;
     }
+  }
+
+  if (state == State::Homing && digitalRead(Feedback) == LOW) {
+    state = State::Normal;
+    stepper1.setCurrentPosition(0);
+    stepper1.enableOutputs();
+    DMXInterface::debug << PSTR("Homed") << endl;
+  }
+
+  if (state == State::Normal && digitalRead(Feedback) == HIGH) {
+    state = State::Init;
+    digitalWrite(EnablePin, LOW);
+    stepper1.disableOutputs();
+    DMXInterface::debug << PSTR("Fault!") << endl;
   }
 
   // Call the non-blocking pinspot main
