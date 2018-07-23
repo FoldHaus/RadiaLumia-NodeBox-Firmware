@@ -222,6 +222,14 @@ void loop() {
       digitalWrite(EnablePin, HIGH);
       DMXInterface::debug << PSTR("Homeing") << endl;
     }
+    if (state == State::Normal) {
+      if (!stepper1.isRunning()) {
+        DMXInterface::debug << PSTR("Test Move to 1000") << endl;
+        handleNewMotorPosition(1000);
+      } else {
+        DMXInterface::debug << PSTR("Already moving. Rejected") << endl;
+      }
+    }
   }
 
   // If we've just received a valid message, mark the time. No Timeout! Yay!
