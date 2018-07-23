@@ -216,6 +216,14 @@ void loop() {
   static bool timeout = true;
   static bool off = true;
 
+  if (Board::DebugButton::isActive()) {
+    if (state == State::Init) {
+      state = State::Homing;
+      digitalWrite(EnablePin, HIGH);
+      DMXInterface::debug << PSTR("Homeing") << endl;
+    }
+  }
+
   // If we've just received a valid message, mark the time. No Timeout! Yay!
   if (handleMessage()) {
     lastMessageTime = millis();
