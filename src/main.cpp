@@ -227,8 +227,8 @@ void loop() {
     }
     if (state == State::Normal) {
       if (!stepper1.isRunning()) {
-        DMXInterface::debug << PSTR("Test Move to 1000") << endl;
-        handleNewMotorPosition(1000);
+        DMXInterface::debug << PSTR("Test Move 1000") << endl;
+        stepper1.move(1000/8);
       } else {
         DMXInterface::debug << PSTR("Already moving. Rejected") << endl;
       }
