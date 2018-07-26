@@ -272,6 +272,7 @@ void loop() {
     digitalWrite(EnablePin, LOW);
     stepper1.disableOutputs();
     DMXInterface::debug << PSTR("Fault!") << endl;
+    delay(10000);
   }
 
   // Call the non-blocking pinspot main
