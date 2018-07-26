@@ -223,6 +223,7 @@ void loop() {
       state = State::Homing;
       digitalWrite(EnablePin, HIGH);
       DMXInterface::debug << PSTR("Homeing") << endl;
+      delay(100);
     }
     if (state == State::Normal) {
       if (!stepper1.isRunning()) {
@@ -246,6 +247,7 @@ void loop() {
       state = State::Homing;
       digitalWrite(EnablePin, HIGH);
       DMXInterface::debug << PSTR("Homeing") << endl;
+      delay(100);
     }
   } else {
     // If we've gone 10 seconds since a message, turn off pinspot
