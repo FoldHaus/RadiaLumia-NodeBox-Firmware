@@ -232,6 +232,8 @@ void loop() {
         DMXInterface::debug << PSTR("Already moving. Rejected") << endl;
       }
     }
+    
+    while (Board::DebugButton::isActive());
   }
 
   // If we've just received a valid message, mark the time. No Timeout! Yay!
