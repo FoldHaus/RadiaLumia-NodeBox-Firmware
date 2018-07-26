@@ -292,14 +292,14 @@ void loop() {
     }
   }
 
-  if (state == State::Homing && digitalRead(Feedback) == LOW) {
+  if (state == State::Homing && Feedback::isActive()) {
     state = State::Normal;
     stepper1.setCurrentPosition(0);
     stepper1.enableOutputs();
     DMXInterface::debug << PSTR("Homed") << endl;
   }
 
-  if (state == State::Normal && digitalRead(Feedback) == HIGH) {
+  if (state == State::Normal && !Feedback::isActive()) {
     state = State::Init;
     digitalWrite(EnablePin, LOW);
     stepper1.disableOutputs();

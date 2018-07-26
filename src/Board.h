@@ -12,6 +12,8 @@ namespace Board {
 
   using DebugButton = Input<Ports::C, 0>;
 
+  using Feedback = Input<Ports::D, 7>;
+
   constexpr int RS485RxEnable     = A1; // PC1
 
   constexpr int PinSpot = 3; // PD3
@@ -22,10 +24,6 @@ namespace Board {
   constexpr int DirectionPin      = 9; // PB1
   // ClearPath Input B (STEP);
   constexpr int StepPin           = 8; // PB0
-
-  constexpr int Feedback          = 7; // PD7
-
-
 }
 
 }
