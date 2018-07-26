@@ -213,7 +213,7 @@ void testPinSpot() {
 void loop() {
   static unsigned long lastMessageTime = 0;
   // Timeout flag defaults to on
-  static bool timeout = true;
+  static bool timeout = false;
   static bool off = true;
 
   if (Board::DebugButton::isActive()) {
