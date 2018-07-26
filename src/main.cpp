@@ -109,6 +109,8 @@ long handleNewMotorPosition(unsigned long position) {
   stepper1.moveTo(position);
   
   const long delta = position - lastPosition;
+  
+  lastPosition = position;
 
   return delta;
 }
