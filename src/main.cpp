@@ -97,10 +97,6 @@ void testMotorSteps() {
   static bool toggle = false;
   static unsigned long lastTime = 0;
 
-  auto time = millis();
-
-  if (time - lastTime < 4000) return;
-  lastTime = time;
 
   const long next = toggle ? 0 : 10000;
 
@@ -300,7 +296,7 @@ void loop() {
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
   // testPinSpot();
-  testMotorSteps();
+  // testMotorSteps();
 
   // Toggle the pinspot on and off
   // digitalWrite(PinSpot, millis() % 3000 < 1000 ? HIGH : LOW);
