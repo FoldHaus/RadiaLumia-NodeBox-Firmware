@@ -97,6 +97,16 @@ void testMotorSteps() {
   static bool toggle = false;
   static unsigned long lastTime = 0;
 
+  const auto time = millis();
+
+  if (stepper1.isRunning()) {
+    lastTime = time;
+    return;
+  }
+
+  if (time - lastTime < 1000) {
+    return;
+  }
 
   const long next = toggle ? 0 : 10000;
 
