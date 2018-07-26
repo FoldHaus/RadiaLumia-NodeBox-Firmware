@@ -545,6 +545,8 @@ void AccelStepper::step8(long step)
 // Prevents power consumption on the outputs
 void    AccelStepper::disableOutputs()
 {   
+    enabled = false;
+
     if (! _interface) return;
 
     setOutputPins(0); // Handles inversion automatically
@@ -557,6 +559,7 @@ void    AccelStepper::disableOutputs()
 
 void    AccelStepper::enableOutputs()
 {
+    enabled = true;
     if (! _interface) 
 	return;
 

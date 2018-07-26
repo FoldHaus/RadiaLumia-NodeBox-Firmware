@@ -119,6 +119,17 @@ void testMotorSteps() {
 
 long handleNewMotorPosition(unsigned long position) {
   static unsigned long lastPosition = 0;
+  static bool activeWarning = false;
+
+  if (stepper1.isEnabled()) {
+    activeWarning = false;
+  } else {
+    if (!activeWarning) {
+      activeWarning = true;
+      DMXInterface::debug << PSTR("Rejected move") << endl;
+    }
+    return;
+  }
 
   // Limit motor position to some range
   if (position > maxPulses) {
