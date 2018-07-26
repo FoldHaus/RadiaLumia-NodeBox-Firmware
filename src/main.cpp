@@ -13,7 +13,7 @@ using namespace Board;
 
 namespace Debug {
   namespace DMX {
-    constexpr bool Messages = false;
+    constexpr bool Messages = true;
   }
 }
 
