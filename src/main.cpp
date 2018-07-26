@@ -17,12 +17,25 @@ namespace Debug {
   }
 }
 
-constexpr unsigned int maxRPM            = 2000;
-constexpr unsigned int maxAccel          = 8000;
-constexpr unsigned int maxTravelInches   = 28;
-constexpr unsigned int countsPerRotation = 200; //must be set to this in the Clearpath firmware
-constexpr unsigned int rotationsPerInch  = 4;  //must be set per lead screw pitch
-constexpr unsigned int maxCounts         = maxTravelInches * countsPerRotation * rotationsPerInch;
+// "Pulses" are traditional stepper motor steps (Tied to "Input Resolution")
+// "Counts" are clearpath internal encoder counts (fixed at 800)
+
+constexpr unsigned long maxRPM            = 2000;
+constexpr unsigned long maxAccel          = 8000;
+
+constexpr unsigned long maxTravelInches   = 28; // Old and possibly wrong
+constexpr unsigned long rotationsPerInch  = 4;  //must be set per lead screw pitch
+
+constexpr unsigned long pulsesPerRevolution = 200; //must be set to this in the Clearpath firmware
+constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
+
+// 103k counts ~ range for hexa-nodes
+// 88k counts ~ range for penta-nodes
+constexpr unsigned long countsToOpen = 103000;
+
+// Full range in pulses
+constexpr unsigned long maxPulses = pulsesPerRevolution * countsToOpen / countsPerRevolution;
+constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution;
 
 enum class State : u1 {
   Init,
@@ -44,7 +57,7 @@ void setupMotorWithAccelStepperLib() {
 
   stepper1.setPinsInverted(true, false, false);
 
-  stepper1.setMaxSpeed((maxRPM/60/8)*countsPerRotation);
+  stepper1.setMaxSpeed((maxRPM/60/8)*pulsesPerRevolution);
   stepper1.setAcceleration(maxAccel);
 }
 
@@ -102,8 +115,8 @@ long handleNewMotorPosition(unsigned long position) {
   static unsigned long lastPosition = 0;
 
   // Limit motor position to some range
-  if (position > maxCounts) {
-    position = maxCounts;
+  if (position > maxPulses) {
+    position = maxPulses;
   }
 
   stepper1.moveTo(position);
