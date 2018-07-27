@@ -598,10 +598,6 @@ protected:
     /// Current direction motor is spinning in
     /// Protected because some peoples subclasses need it to be so
     boolean _direction; // 1 == CW
-
-    inline bool isEnabled() {
-        return enabled;
-    }
     
 private:
     /// Number of pins on the stepper motor. Permits 2 or 4. 2 pins is a
@@ -679,6 +675,12 @@ private:
      * true if we've got our outputs enabled
      */
     bool enabled = false;
+
+public:   
+
+    inline bool isEnabled() {
+        return enabled;
+    }
 };
 
 /// @example Random.pde
