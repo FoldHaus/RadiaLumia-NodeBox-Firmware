@@ -243,6 +243,18 @@ void testPinSpot() {
   handleNewPinSpotBrightness(testNum);
 }
 
+void home() {
+  state = State::Homing;
+  digitalWrite(EnablePin, HIGH);
+  DMXInterface::debug << PSTR("Homeing") << endl;
+  
+  delay(25 * 1000);
+  
+  state = State::Normal;
+  stepper1.setCurrentPosition(0);
+  stepper1.enableOutputs();
+  DMXInterface::debug << PSTR("Homed") << endl;
+}
 
 void printPositionIfChanged() {
   static typeof(stepper1.currentPosition()) last = -1;
@@ -263,11 +275,9 @@ void loop() {
   static bool off = true;
 
   if (Board::DebugButton::isActive()) {
+
     if (state == State::Init) {
-      state = State::Homing;
-      digitalWrite(EnablePin, HIGH);
-      DMXInterface::debug << PSTR("Homeing") << endl;
-      delay(100);
+      home();
     }
     if (state == State::Normal) {
       if (!stepper1.isRunning()) {
@@ -288,10 +298,7 @@ void loop() {
     off = false;
 
     if (state == State::Init) {
-      state = State::Homing;
-      digitalWrite(EnablePin, HIGH);
-      DMXInterface::debug << PSTR("Homeing") << endl;
-      delay(100);
+      home();
     }
   } else {
     // If we've gone 10 seconds since a message, turn off pinspot
