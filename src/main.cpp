@@ -108,7 +108,7 @@ void testMotorSteps() {
     return;
   }
 
-  const long next = toggle ? 0 : 10000;
+  const long next = toggle ? 0 : maxPulses;
 
   toggle = !toggle;
 
