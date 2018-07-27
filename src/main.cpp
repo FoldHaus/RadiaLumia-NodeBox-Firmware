@@ -40,6 +40,9 @@ constexpr unsigned long backoffCounts = 1200;
 constexpr unsigned long maxPulses = pulsesPerRevolution * (countsToOpen - backoffCounts) / countsPerRevolution;
 constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution;
 
+constexpr unsigned long maxPulsesPerSecond = (maxRPM/60) * pulsesPerRevolution;
+constexpr unsigned long maxPulsesPerSecSec = maxAccel;
+
 enum class State : u1 {
   Init,
   Homing,
@@ -60,8 +63,8 @@ void setupMotorWithAccelStepperLib() {
 
   stepper1.setPinsInverted(true, false, false);
 
-  stepper1.setMaxSpeed((maxRPM/60/8)*pulsesPerRevolution);
-  stepper1.setAcceleration(maxAccel);
+  stepper1.setMaxSpeed(maxPulsesPerSecond);
+  stepper1.setAcceleration(maxPulsesPerSecSec);
 }
 
 void setup() {
