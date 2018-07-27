@@ -87,6 +87,8 @@ void setup() {
   // Tell the world we're all set
   DMXInterface::debug << PSTR("Init complete") << endl;
 
+  DMXInterface::debug << PSTR("Count limit: ") << countsToOpen << PSTR(" Pulse limit: ") << maxPulses << endl;
+
   // Turn off led to indicate end of init
   DebugLED::off();
 }
