@@ -47,8 +47,9 @@ boolean AccelStepper::runSpeed()
     unsigned long time = micros();   
     if (time - _lastStepTime >= _stepInterval)
     {
-        for (uint_t i = 0; i < overstepCount; i++)
-        {
+        // I'd like overstepping to be done here, but the math doesn't quite work out and it oscillates. Haven't gotten to the bottom of that yet
+        // for (uint8_t i = 0; i < overstepCount; i++)
+        // {
             if (_direction == DIRECTION_CW)	{
                 // Clockwise
                 _currentPos += 1;
@@ -59,7 +60,7 @@ boolean AccelStepper::runSpeed()
                 _currentPos -= 1;
             }
             step(_currentPos);
-        }
+        // }
 
         _lastStepTime = time; // Caution: does not account for costs in step()
 
@@ -395,13 +396,14 @@ void AccelStepper::step1(long step)
 
     // _pin[0] is step, _pin[1] is direction
     setOutputPins(_direction ? 0b10 : 0b00); // Set direction first else get rogue pulses
-    for (uint8_t i = 0; i < 8; i++) {
+    
+    for (uint8_t i = 0; i <= overstepCount; i++)
+    {
         setOutputPins(_direction ? 0b11 : 0b01); // step HIGH
         // Caution 200ns setup time 
         // Delay the minimum allowed pulse width
-        // delayMicroseconds(_minPulseWidth);
+        delayMicroseconds(_minPulseWidth);
         setOutputPins(_direction ? 0b10 : 0b00); // step LOW
-        // delayMicroseconds(_minPulseWidth);
     }
 }
 
@@ -411,7 +413,11 @@ void AccelStepper::step1(long step)
 // Subclasses can override
 void AccelStepper::step2(long step)
 {
-    switch (step & 0x3)
+    
+    for (uint8_t i = 0; i <= overstepCount; i++)
+    {
+
+    switch (i & 0x3)
     {
 	case 0: /* 01 */
 	    setOutputPins(0b10);
@@ -428,6 +434,8 @@ void AccelStepper::step2(long step)
 	case 3: /* 00 */
 	    setOutputPins(0b00);
 	    break;
+    }
+
     }
 }
 // 3 pin step function
