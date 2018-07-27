@@ -34,8 +34,10 @@ constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
 // 98k counts ~ range for test rig
 constexpr unsigned long countsToOpen = 98UL * 1000;
 
+constexpr unsigned long backoffCounts = 1200;
+
 // Full range in pulses
-constexpr unsigned long maxPulses = pulsesPerRevolution * countsToOpen / countsPerRevolution;
+constexpr unsigned long maxPulses = pulsesPerRevolution * (countsToOpen - backoffCounts) / countsPerRevolution;
 constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution;
 
 enum class State : u1 {
