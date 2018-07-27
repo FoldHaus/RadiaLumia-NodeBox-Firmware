@@ -303,6 +303,7 @@ void loop() {
   } else {
     // If we've gone 10 seconds since a message, turn off pinspot
     if (!off && millis() - lastMessageTime >= 10 * 1000) {
+      DMXInterface::debug << PSTR("Shutting down pinspot for safety") << endl;
       handleNewPinSpotBrightness(0);
       off = true;
     }
