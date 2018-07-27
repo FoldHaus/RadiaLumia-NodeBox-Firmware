@@ -242,6 +242,18 @@ void testPinSpot() {
 }
 
 
+void printPositionIfChanged() {
+  static typeof(stepper1.currentPosition()) last = -1;
+
+  auto const pos = stepper1.currentPosition();
+
+  if (last == pos) return;
+
+  last = pos;
+
+  DMXInterface::debug << PSTR("At pos: ") << pos << endl;
+}
+
 void loop() {
   static unsigned long lastMessageTime = 0;
   // Timeout flag defaults to on
@@ -312,6 +324,7 @@ void loop() {
 
   // Call non-blocking stepper main
   stepper1.run();
+  printPositionIfChanged();
   
   // Test the motor's Feedback line
   // DebugLED::set(digitalRead(Feedback) == LOW);
