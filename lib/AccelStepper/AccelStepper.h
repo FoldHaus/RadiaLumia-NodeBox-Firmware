@@ -676,10 +676,23 @@ private:
      */
     bool enabled = false;
 
+    /**
+     * overstep by a factor of n+1
+     * 
+     * This is useful for running motors faster than the minimum time step period allows.
+     * 
+     * Do not use this with regular stepper motors. Only for controllers that do an extra level of jerk smoothing like ClearPath with "RAS Jerk Limit"
+     */
+    uint8_t overstepCount = 0;
+
 public:   
 
     inline bool isEnabled() {
         return enabled;
+    }
+
+    inline void setOverstepCount(typeof(overstepCount) n) {
+        overstepCount = n;
     }
 };
 

@@ -29,6 +29,8 @@ constexpr unsigned long rotationsPerInch  = 4;  //must be set per lead screw pit
 constexpr unsigned long pulsesPerRevolution = 200; //must be set to this in the Clearpath firmware
 constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
 
+constexpr unsigned int overstep = 7;
+
 // 103k counts ~ range for hexa-nodes
 // 88k counts ~ range for penta-nodes
 // 98k counts ~ range for test rig
@@ -37,11 +39,11 @@ constexpr unsigned long countsToOpen = 98UL * 1000;
 constexpr unsigned long backoffCounts = 1200;
 
 // Full range in pulses
-constexpr unsigned long maxPulses = pulsesPerRevolution * (countsToOpen - backoffCounts) / countsPerRevolution;
-constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution;
+constexpr unsigned long maxPulses = pulsesPerRevolution * (countsToOpen - backoffCounts) / countsPerRevolution / (1 + overstep);
+constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution / (1 + overstep);
 
-constexpr unsigned long maxPulsesPerSecond = (maxRPM/60) * pulsesPerRevolution;
-constexpr unsigned long maxPulsesPerSecSec = maxAccel;
+constexpr unsigned long maxPulsesPerSecond = (maxRPM/60) * pulsesPerRevolution / (1 + overstep);
+constexpr unsigned long maxPulsesPerSecSec = maxAccel / (1 + overstep);
 
 enum class State : u1 {
   Init,
@@ -62,6 +64,7 @@ void setupMotorWithAccelStepperLib() {
   pinMode(EnablePin, OUTPUT);
 
   stepper1.setPinsInverted(true, false, false);
+  stepper1.setOverstepCount(overstep);
 
   stepper1.setMaxSpeed(maxPulsesPerSecond);
   stepper1.setAcceleration(maxPulsesPerSecSec);

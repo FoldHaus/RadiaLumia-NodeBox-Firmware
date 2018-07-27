@@ -42,30 +42,32 @@ boolean AccelStepper::runSpeed()
 {
     // Dont do anything unless we actually have a step interval
     if (!_stepInterval)
-	return false;
+	    return false;
 
     unsigned long time = micros();   
     if (time - _lastStepTime >= _stepInterval)
     {
-	if (_direction == DIRECTION_CW)
-	{
-	    // Clockwise
-	    _currentPos += 1;
-	}
-	else
-	{
-	    // Anticlockwise  
-	    _currentPos -= 1;
-	}
-	step(_currentPos);
+        for (uint_t i = 0; i < overstepCount; i++)
+        {
+            if (_direction == DIRECTION_CW)	{
+                // Clockwise
+                _currentPos += 1;
+            }
+            else
+            {
+                // Anticlockwise  
+                _currentPos -= 1;
+            }
+            step(_currentPos);
+        }
 
-	_lastStepTime = time; // Caution: does not account for costs in step()
+        _lastStepTime = time; // Caution: does not account for costs in step()
 
-	return true;
+        return true;
     }
     else
     {
-	return false;
+	    return false;
     }
 }
 
@@ -262,6 +264,9 @@ void AccelStepper::setMaxSpeed(float speed)
 {
     if (speed < 0.0)
        speed = -speed;
+
+    // speed /= 1 + overstepCount;
+
     if (_maxSpeed != speed)
     {
 	_maxSpeed = speed;
@@ -286,6 +291,9 @@ void AccelStepper::setAcceleration(float acceleration)
 	return;
     if (acceleration < 0.0)
       acceleration = -acceleration;
+      
+    // acceleration /= 1 + overstepCount;
+
     if (_acceleration != acceleration)
     {
 	// Recompute _n per Equation 17
