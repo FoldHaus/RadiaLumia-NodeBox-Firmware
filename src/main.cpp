@@ -320,7 +320,7 @@ void loop() {
     state = State::Init;
     digitalWrite(EnablePin, LOW);
     stepper1.disableOutputs();
-    DMXInterface::debug << PSTR("Fault!") << endl;
+    DMXInterface::debug << PSTR("Fault! At: ") << stepper1.currentPosition() << endl;
     delay(3000);
   }
 
