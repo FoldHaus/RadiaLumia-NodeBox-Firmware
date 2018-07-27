@@ -279,6 +279,8 @@ void loop() {
     if (state == State::Init) {
       home();
     }
+    else
+
     if (state == State::Normal) {
       if (!stepper1.isRunning()) {
         DMXInterface::debug << PSTR("Test Move") << endl;
