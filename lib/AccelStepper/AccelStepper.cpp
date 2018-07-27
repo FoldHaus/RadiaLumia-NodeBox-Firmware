@@ -182,7 +182,7 @@ void AccelStepper::computeNewSpeed()
 // returns true if the motor is still running to the target position.
 boolean AccelStepper::run()
 {
-    if (!enabled) return;
+    if (!enabled) return false;
 
     if (runSpeed())
 	computeNewSpeed();
