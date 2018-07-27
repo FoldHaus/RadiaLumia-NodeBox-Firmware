@@ -31,7 +31,8 @@ constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
 
 // 103k counts ~ range for hexa-nodes
 // 88k counts ~ range for penta-nodes
-constexpr unsigned long countsToOpen = 103000;
+// 98k counts ~ range for test rig
+constexpr unsigned long countsToOpen = 98UL * 1000;
 
 // Full range in pulses
 constexpr unsigned long maxPulses = pulsesPerRevolution * countsToOpen / countsPerRevolution;
