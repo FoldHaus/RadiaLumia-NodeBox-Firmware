@@ -74,6 +74,13 @@ void setupPinspot() {
   // Initialize the pinspot, off
   pinMode(PinSpot, OUTPUT);
   digitalWrite(PinSpot, LOW);
+
+  ASSR = 0;
+
+  OCR2B = 0;
+
+  TCCR2A = 0b00010011;
+  TCCR2B = 0b00000110;
 }
 
 void setup() {
@@ -168,16 +175,18 @@ uint16_t PinSpotAmplitude = 0;
  * @return the actual brightness used
  */
 inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
-  // Limit anyone from accidentally setting something too high,
-  // even though it would not really hurt anything with the current implementation
+  // Limit anyone from accidentally setting something too high
   if (ampl > PinSpotAmplitudeMax) {
-    return PinSpotAmplitude = PinSpotAmplitudeMax;
+    ampl = PinSpotAmplitudeMax;
   }
+
+  ampl >>= 4;
   
-  return PinSpotAmplitude = ampl;
+  return OCR2B = PinSpotAmplitude = ampl;
 }
 
 inline void loopDoPinSpot() {
+  return;
   digitalWrite(PinSpot,
       // If we're max, really be full on and skip the micros() check
       PinSpotAmplitude >= PinSpotAmplitudeMax
@@ -253,7 +262,7 @@ void testPinSpot() {
   // Do a logarithmic dimming of linear input time makes dimmer seem more natural
   testNum = curvePS(testNum);
 
-  handleNewPinSpotBrightness(testNum);
+  DMXInterface::debug << handleNewPinSpotBrightness(testNum) << endl;
 }
 
 void home() {
@@ -347,7 +356,7 @@ void loop() {
   // Test the motor's Feedback line
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
-  // testPinSpot();
+  testPinSpot();
   // testMotorSteps();
 
   // Toggle the pinspot on and off
