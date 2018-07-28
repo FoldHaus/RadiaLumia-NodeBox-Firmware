@@ -70,6 +70,12 @@ void setupMotorWithAccelStepperLib() {
   stepper1.setAcceleration(maxPulsesPerSecSec);
 }
 
+void setupPinspot() {
+  // Initialize the pinspot, off
+  pinMode(PinSpot, OUTPUT);
+  digitalWrite(PinSpot, LOW);
+}
+
 void setup() {
   // Initialize blip on LED
   DebugLED::on();
@@ -84,10 +90,8 @@ void setup() {
   // Tell the world we're alive
   DMXInterface::debug << PSTR("Setup") << endl;
 
-  // Initialize the pinspot, off
-  pinMode(PinSpot, OUTPUT);
-  digitalWrite(PinSpot, LOW);
-
+  setupPinspot();
+  
   setupMotorWithAccelStepperLib();
 
   // Delay some more for no real reason
