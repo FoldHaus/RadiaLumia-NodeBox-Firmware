@@ -31,10 +31,10 @@ constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
 
 constexpr unsigned int overstep = 7;
 
-// 103k counts ~ range for hexa-nodes
-// 88k counts ~ range for penta-nodes
+// 108.3k counts ~ range for hexa-nodes
+// 86.5k counts ~ range for penta-nodes
 // 98k counts ~ range for test rig
-constexpr unsigned long countsToOpen = 98UL * 1000;
+constexpr unsigned long countsToOpen = 108300;
 
 constexpr unsigned long backoffCounts = 1200;
 
