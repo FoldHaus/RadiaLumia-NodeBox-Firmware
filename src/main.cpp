@@ -79,7 +79,7 @@ void setupPinspot() {
 
   OCR2B = 0;
 
-  TCCR2A = 0b00010011;
+  TCCR2A = 0b00100011;
   TCCR2B = 0b00000110;
 }
 
