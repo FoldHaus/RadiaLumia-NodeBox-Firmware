@@ -274,8 +274,29 @@ void testPinSpot() {
 
 void home() {
   state = State::Homing;
+
+  digitalWrite(EnablePin, LOW);
+  
+  delay(10);
+
+  if (Board::Feedback::isActive()) {
+    DMXInterface::debug << PSTR("Short on HLFB or motor missconfigured") << endl;
+    Board::DebugLED::on();
+    while(1);
+  }
+
   digitalWrite(EnablePin, HIGH);
-  DMXInterface::debug << PSTR("Homeing") << endl;
+  DMXInterface::debug << PSTR("Homing") << endl;
+
+  delay(100);
+  
+  if (!Board::Feedback::isActive()) {
+    DMXInterface::debug << PSTR("No Motor Present") << endl;
+
+    Board::DebugLED::on();
+
+    while(1);
+  }
   
   delay(25 * 1000);
   
