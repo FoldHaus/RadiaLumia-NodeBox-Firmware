@@ -80,7 +80,7 @@ void setupMotorWithAccelStepperLib() {
 
 void setupPinspot() {
   // Initialize the pinspot, off
-  pinMode(PinSpot, OUTPUT);
+  // pinMode(PinSpot, OUTPUT);
   digitalWrite(PinSpot, LOW);
 
   ASSR = 0;
@@ -188,6 +188,7 @@ inline uint8_t handleNewPinSpotBrightness(uint8_t ampl) {
     ampl = PinSpotAmplitudeMax;
   }
 
+  pinMode(PinSpot, ampl ? OUTPUT : INPUT);
   
   return OCR2B = PinSpotAmplitude = ampl;
 }
