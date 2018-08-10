@@ -15,6 +15,9 @@ namespace Debug {
   namespace DMX {
     constexpr bool Messages = true;
   }
+  namespace Motor {
+    constexpr bool TestWithButton = false;
+  }
 }
 
 // "Pulses" are traditional stepper motor steps (Tied to "Input Resolution")
@@ -297,17 +300,21 @@ void loop() {
 
   if (Board::DebugButton::isActive()) {
 
-    if (state == State::Init) {
-      home();
-    }
-    else
+    if (Debug::Motor::TestWithButton) {
+      if (state == State::Init) {
+        home();
+      }
+      else
 
-    if (state == State::Normal) {
-      if (!stepper1.isRunning()) {
-        DMXInterface::debug << PSTR("Test Move") << endl;
-        testMotorSteps();
-      } else {
-        DMXInterface::debug << PSTR("Already moving. Rejected") << endl;
+      if (state == State::Normal) {
+        if (!stepper1.isRunning()) {
+          DMXInterface::debug << PSTR("Test Move") << endl;
+          testMotorSteps();
+        } else {
+          DMXInterface::debug << PSTR("Already moving. Rejected") << endl;
+        }
+      }
+    }
       }
     }
     
