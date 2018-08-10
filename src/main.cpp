@@ -312,6 +312,7 @@ void loop() {
     }
     
     while (Board::DebugButton::isActive());
+    delay(10);
   }
 
   // If we've just received a valid message, mark the time. No Timeout! Yay!
