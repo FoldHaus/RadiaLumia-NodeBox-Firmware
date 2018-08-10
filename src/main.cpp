@@ -150,7 +150,7 @@ long handleNewMotorPosition(unsigned long position) {
       activeWarning = true;
       DMXInterface::debug << PSTR("Rejected move") << endl;
     }
-    return;
+    return 0;
   }
 
   // Limit motor position to some range
