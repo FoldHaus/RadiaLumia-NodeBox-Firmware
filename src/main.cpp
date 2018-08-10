@@ -174,13 +174,12 @@ uint16_t PinSpotAmplitude = 0;
 /**
  * @return the actual brightness used
  */
-inline uint16_t handleNewPinSpotBrightness(uint16_t ampl) {
+inline uint8_t handleNewPinSpotBrightness(uint8_t ampl) {
   // Limit anyone from accidentally setting something too high
   if (ampl > PinSpotAmplitudeMax) {
     ampl = PinSpotAmplitudeMax;
   }
 
-  ampl >>= 4;
   
   return OCR2B = PinSpotAmplitude = ampl;
 }
@@ -194,7 +193,7 @@ inline void loopDoPinSpot() {
       // Use micros() to generate our base PWM sawtooth that we're comparing to
       // If sawtooth function is ever less than the current desired amplitude, turn on, otherwise off.
       // Therefore, if PinSpotAmplitude is 0, this does not turn on.
-      (micros() & PinSpotAmplitudeMax) < PinSpotAmplitude
+      (micros() >> 4 & PinSpotAmplitudeMax) < PinSpotAmplitude
     ?
       HIGH
     :
