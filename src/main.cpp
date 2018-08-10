@@ -176,7 +176,7 @@ long handleNewMotorPosition(unsigned long position) {
 }
 
 constexpr auto PinSpotAmplitudeBits = 12;
-constexpr auto PinSpotAmplitudeMax = (1 << PinSpotAmplitudeBits) - 1;
+constexpr auto PinSpotAmplitudeMax = 255;
 uint16_t PinSpotAmplitude = 0;
 
 /**
