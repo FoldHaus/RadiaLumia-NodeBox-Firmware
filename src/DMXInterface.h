@@ -19,7 +19,7 @@ namespace Foldhaus {
  */
 typedef struct {
   uint32_t command :24;
-  uint16_t pinspot;
+  uint8_t pinspot;
 } DMXDataShape;
 
 using namespace libCameron;
