@@ -4,7 +4,7 @@ This firmware is for running on an AVR ATmega328p that is in each node of the sp
 
 ## Features
 
-This software (will) do 3 things:
+This software does 3 things:
  - Read DMX512 data from Pixlite output
  - Generate A/B/EN motor signals from DMX data
  - Turn on and off LED driver from DMX data
