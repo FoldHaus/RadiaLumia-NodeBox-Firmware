@@ -210,6 +210,14 @@ inline void loopDoPinSpot() {
   );
 }
 
+inline void loopDoMotor() {
+  stepper1.run();
+  printPositionIfChanged();
+  
+  // Test the motor's Feedback line
+  // DebugLED::set(digitalRead(Feedback) == LOW);
+}
+
 bool handleMessage() {
   auto msg = DMXInterface::getMessage();
 
@@ -321,11 +329,7 @@ void printPositionIfChanged() {
   }
 }
 
-void loop() {
-  static unsigned long lastMessageTime = 0;
-  // Timeout flag defaults to on
-  static bool timeout = false;
-  static bool off = true;
+void loopDoDebug() {
 
   if (Board::DebugButton::isActive()) {
 
@@ -363,6 +367,13 @@ void loop() {
     while (Board::DebugButton::isActive());
     delay(10);
   }
+}
+
+void loopDoMain() {
+  static unsigned long lastMessageTime = 0;
+  // Timeout flag defaults to on
+  static bool timeout = false;
+  static bool off = true;
 
   // If we've just received a valid message, mark the time. No Timeout! Yay!
   if (handleMessage()) {
@@ -394,16 +405,19 @@ void loop() {
     DMXInterface::debug << PSTR("Fault! At: ") << stepper1.currentPosition() << endl;
     delay(3000);
   }
+}
+
+void loop() {
+
+  loopDoDebug();
+
+  loopDoMain();
 
   // Call the non-blocking pinspot main
   loopDoPinSpot();
 
   // Call non-blocking stepper main
-  stepper1.run();
-  printPositionIfChanged();
-  
-  // Test the motor's Feedback line
-  // DebugLED::set(digitalRead(Feedback) == LOW);
+  loopDoMotor();
 
   // testPinSpot();
   // testMotorSteps();
@@ -415,5 +429,4 @@ void loop() {
   // if (millis() % 1000 == 0) {
   //   DMXInterface::debug << PSTR("Hello") << millis() << endl;
   // }
-
 }
