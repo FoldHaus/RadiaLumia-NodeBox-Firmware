@@ -19,6 +19,10 @@ namespace Debug {
     constexpr bool PositionUpdates = false;
     constexpr bool TestWithButton = false;
   }
+
+  namespace PinSpot {
+    constexpr bool TestWithButton = true;
+  }
 }
 
 // "Pulses" are traditional stepper motor steps (Tied to "Input Resolution")
@@ -318,7 +322,20 @@ void loop() {
         }
       }
     }
+
+    if (Debug::PinSpot::TestWithButton) {
+      const auto ocr = OCR2B;
+
+      if (ocr == 0xff) {
+        handleNewPinSpotBrightness(0);
       }
+      else if (ocr == 0) {
+        handleNewPinSpotBrightness(1);
+      }
+      else {
+        handleNewPinSpotBrightness((ocr << 1) + 1);
+      }
+      DMXInterface::debug << PSTR("New PinSpot: ") << OCR2B << endl;
     }
     
     while (Board::DebugButton::isActive());
@@ -366,7 +383,7 @@ void loop() {
   // Test the motor's Feedback line
   // DebugLED::set(digitalRead(Feedback) == LOW);
 
-  testPinSpot();
+  // testPinSpot();
   // testMotorSteps();
 
   // Toggle the pinspot on and off
