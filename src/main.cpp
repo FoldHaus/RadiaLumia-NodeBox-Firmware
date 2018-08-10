@@ -16,6 +16,7 @@ namespace Debug {
     constexpr bool Messages = true;
   }
   namespace Motor {
+    constexpr bool PositionUpdates = false;
     constexpr bool TestWithButton = false;
   }
 }
@@ -289,7 +290,9 @@ void printPositionIfChanged() {
 
   last = pos;
 
-  DMXInterface::debug << PSTR("At pos: ") << pos << endl;
+  if (Debug::Motor::PositionUpdates) {
+    DMXInterface::debug << PSTR("At pos: ") << pos << endl;
+  }
 }
 
 void loop() {
