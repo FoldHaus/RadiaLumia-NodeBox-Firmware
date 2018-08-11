@@ -164,6 +164,7 @@ void Motor::printPositionIfChanged() {
 }
 
 void Motor::loop() {
+  if (state == State::Init) return;
 
   if (state == State::Homing) {
     if (millis() - homeStartedAt > maxHomingTimeMillis) {
