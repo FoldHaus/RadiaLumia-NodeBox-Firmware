@@ -56,9 +56,29 @@ void printPositionIfChanged();
 void loop();
 void selfTest();
 long handleNewPosition(uint16_t position);
+/**
+ * Update live and saved values
+ * 
+ * @return 0 updated. 1 no change. 2 invalid value
+ */ 
 uint8_t updateMaxPulses(uint16_t max);
+/**
+ * Update live and saved values
+ * 
+ * @return 0 updated. 1 no change. 2 invalid value
+ */ 
 uint8_t updateMaxPulsesPerSec(uint16_t max);
+/**
+ * Update live and saved values
+ * 
+ * @return 0 updated. 1 no change. 2 invalid value
+ */ 
 uint8_t updateMaxPulsesPerSecPerSec(uint16_t max);
+/**
+ * Update live and saved values
+ * 
+ * @return 0 updated. 1 no change. 2 invalid value
+ */ 
 uint8_t updateMaxHomingTimeMillis(uint16_t max);
 
 }
