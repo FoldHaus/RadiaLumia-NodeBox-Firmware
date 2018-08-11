@@ -98,7 +98,10 @@ void setup() {
   DebugLED::off();
 }
 
-uint8_t updateShutdownPosition(const uint16_t pos) {
+uint8_t updateShutdownPosition(uint16_t pos) {
+  // Easy shortcut for controller to set disabled
+  if (pos == 0xffff) pos = shutdownPosMax;
+
   if (pos > shutdownPosMax) return 2;
 
   if (shutdownPos == pos) return 1;
