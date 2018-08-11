@@ -11,9 +11,16 @@
 using namespace FoldHaus;
 using namespace Motor;
 
-unsigned long EEMEM maxPulsesEE;
+uint16_t EEMEM maxPulsesEE = defaultMaxPulses;
+uint16_t EEMEM maxPulsesPerSecondEE = defaultMaxPulsesPerSecond;
+uint16_t EEMEM maxPulsesPerSecSecEE = defaultMaxPulsesPerSecSec;
 
-unsigned long Motor::maxPulses;
+uint16_t Motor::maxPulses;
+uint16_t Motor::maxPulsesPerSecond;
+uint16_t Motor::maxPulsesPerSecSec;
+
+uint16_t EEMEM maxHomingTimeMillisEE = defaultMaxHomingTimeMillis;
+uint16_t Motor::maxHomingTimeMillis;
 
 enum class State : u1 {
   Init,
@@ -36,25 +43,82 @@ void Motor::setup() {
   stepper1.setMaxSpeed(maxPulsesPerSecond);
   stepper1.setAcceleration(maxPulsesPerSecSec);
 
-  const auto ee = eeprom_read_dword(&maxPulsesEE);
+  auto ee = eeprom_read_word(&maxPulsesEE);
 
   if (ee > absoluteMaxPulses) {
-    eeprom_write_dword(&maxPulsesEE, maxPulses = defaultMaxPulses);
+    eeprom_write_word(&maxPulsesEE, maxPulses = defaultMaxPulses);
+    DMXInterface::debug << PSTR("Pulse limit set to default") << endl;
   } else {
     maxPulses = ee;
+    DMXInterface::debug << PSTR("Pulse limit loaded from EEPROM: ") << ee << endl;
   }
-  
-  DMXInterface::debug << PSTR("Pulse limit: ") << maxPulses << endl;
-  
-  DMXInterface::debug << PSTR("Absolute limit: ") << absoluteMaxPulses << endl;
+
+  ee = eeprom_read_word(&maxPulsesPerSecondEE);
+
+  if (ee > absoluteMaxPulsesPerSecond) {
+    eeprom_write_word(&maxPulsesPerSecondEE, maxPulsesPerSecond = defaultMaxPulsesPerSecond);
+    DMXInterface::debug << PSTR("PulsePerSec limit set to default") << endl;
+  } else {
+    maxPulsesPerSecond = ee;
+    DMXInterface::debug << PSTR("PulsePerSec limit loaded from EEPROM: ") << ee << endl;
+  }
+
+  ee = eeprom_read_word(&maxPulsesPerSecSecEE);
+
+  if (ee > absoluteMaxPulsesPerSecSec) {
+    eeprom_write_word(&maxPulsesPerSecSecEE, maxPulsesPerSecSec = defaultMaxPulsesPerSecSec);
+    DMXInterface::debug << PSTR("PulsePerSecSec limit set to default") << endl;
+  } else {
+    maxPulsesPerSecSec = ee;
+    DMXInterface::debug << PSTR("PulsePerSecSec limit loaded from EEPROM: ") << ee << endl;
+  }
+
+  ee = eeprom_read_word(&maxHomingTimeMillisEE);
+
+  if (ee > absoluteMaxHomingTimeMillis) {
+    eeprom_write_word(&maxHomingTimeMillisEE, maxHomingTimeMillis = defaultMaxHomingTimeMillis);
+    DMXInterface::debug << PSTR("Homing time limit set to default") << endl;
+  } else {
+    maxHomingTimeMillis = ee;
+    DMXInterface::debug << PSTR("Homing time limit loaded from EEPROM: ") << ee << endl;
+  }
+
 }
 
-void Motor::updateMaxPulses(const unsigned long max) {
-  if (max > absoluteMaxPulses) return;
+uint8_t Motor::updateMaxPulses(const uint16_t max) {
+  if (max > absoluteMaxPulses) return 2;
 
-  if (maxPulses == max) return;
+  if (maxPulses == max) return 1;
 
-  eeprom_write_dword(&maxPulsesEE, maxPulses = max);
+  eeprom_write_word(&maxPulsesEE, maxPulses = max);
+  return 0;
+}
+
+uint8_t Motor::updateMaxPulsesPerSec(const uint16_t max) {
+  if (max > absoluteMaxPulsesPerSecond) return 2;
+
+  if (maxPulsesPerSecond == max) return 1;
+
+  eeprom_write_word(&maxPulsesPerSecondEE, maxPulsesPerSecond = max);
+  return 0;
+}
+
+uint8_t Motor::updateMaxPulsesPerSecPerSec(const uint16_t max) {
+  if (max > absoluteMaxPulsesPerSecSec) return 2;
+
+  if (maxPulsesPerSecSec == max) return 1;
+
+  eeprom_write_word(&maxPulsesPerSecSecEE, maxPulsesPerSecSec = max);
+  return 0;
+}
+
+uint8_t Motor::updateMaxHomingTimeMillis(const uint16_t max) {
+  if (max > absoluteMaxHomingTimeMillis) return 2;
+
+  if (maxHomingTimeMillis == max) return 1;
+
+  eeprom_write_word(&maxHomingTimeMillisEE, maxHomingTimeMillis = max);
+  return 0;
 }
 
 unsigned long homeStartedAt;
@@ -170,7 +234,7 @@ void Motor::selfTest() {
   handleNewPosition(next);
 }
 
-long Motor::handleNewPosition(unsigned long position) {
+long Motor::handleNewPosition(uint16_t position) {
 
   if (state == State::Init) {
     home();
@@ -179,7 +243,7 @@ long Motor::handleNewPosition(unsigned long position) {
 
   if (state != State::Normal) return 0;
 
-  static unsigned long lastPosition = 0;
+  static uint16_t lastPosition = 0;
   static bool activeWarning = false;
 
   if (stepper1.isEnabled()) {
@@ -199,7 +263,7 @@ long Motor::handleNewPosition(unsigned long position) {
 
   stepper1.moveTo(position);
   
-  const long delta = position - lastPosition;
+  const int16_t delta = position - lastPosition;
   
   lastPosition = position;
 

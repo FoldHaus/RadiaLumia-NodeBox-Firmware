@@ -8,8 +8,11 @@ namespace Motor {
 // "Pulses" are traditional stepper motor steps (Tied to "Input Resolution")
 // "Counts" are clearpath internal encoder counts (fixed at 800)
 
-constexpr unsigned long maxRPM            = 2000;
-constexpr unsigned long maxAccel          = 8000;
+constexpr unsigned long defaultMaxRPM            = 2000;
+constexpr unsigned long defaultMaxAccelPPSPS     = 8000;
+
+constexpr unsigned long absoluteMaxRPM            = 2200;
+constexpr unsigned long absoluteMaxAccelPPSPS     = 20000;
 
 constexpr unsigned long maxTravelInches   = 28; // Old and possibly wrong
 constexpr unsigned long rotationsPerInch  = 4;  //must be set per lead screw pitch
@@ -29,23 +32,34 @@ constexpr unsigned long absoluteMaxCounts = 120000;
 constexpr unsigned long backoffCounts = 1200;
 
 // Full range in pulses
-extern unsigned long maxPulses;
-constexpr unsigned long defaultMaxPulses = pulsesPerRevolution * (defaultCountsToOpen - backoffCounts) / countsPerRevolution / (1 + overstep);
-constexpr unsigned long absoluteMaxPulses = pulsesPerRevolution * (absoluteMaxCounts) / countsPerRevolution / (1 + overstep);
-constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution / (1 + overstep);
+extern uint16_t maxPulses;
+constexpr uint16_t defaultMaxPulses = (defaultCountsToOpen - backoffCounts) * pulsesPerRevolution / countsPerRevolution / (1 + overstep);
+constexpr uint16_t absoluteMaxPulses = (absoluteMaxCounts) * pulsesPerRevolution / countsPerRevolution / (1 + overstep);
+// Holdover...
+constexpr uint16_t maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution / (1 + overstep);
 
-constexpr unsigned long maxPulsesPerSecond = (maxRPM/60) * pulsesPerRevolution / (1 + overstep);
-constexpr unsigned long maxPulsesPerSecSec = maxAccel / (1 + overstep);
+extern uint16_t maxPulsesPerSecond;
+constexpr uint16_t defaultMaxPulsesPerSecond = (defaultMaxRPM/60) * pulsesPerRevolution / (1 + overstep);
+constexpr uint16_t absoluteMaxPulsesPerSecond = (absoluteMaxRPM/60) * pulsesPerRevolution / (1 + overstep);
 
-constexpr unsigned long maxHomingTimeMillis = 25000;
+extern uint16_t maxPulsesPerSecSec;
+constexpr uint16_t defaultMaxPulsesPerSecSec = defaultMaxAccelPPSPS / (1 + overstep);
+constexpr uint16_t absoluteMaxPulsesPerSecSec = absoluteMaxAccelPPSPS / (1 + overstep);
+
+extern uint16_t maxHomingTimeMillis;
+constexpr uint16_t defaultMaxHomingTimeMillis = 25000;
+constexpr uint16_t absoluteMaxHomingTimeMillis = 65000;
 
 void setup();
 void home();
 void printPositionIfChanged();
 void loop();
 void selfTest();
-long handleNewPosition(unsigned long position);
-void updateMaxPulses(unsigned long max);
+long handleNewPosition(uint16_t position);
+uint8_t updateMaxPulses(uint16_t max);
+uint8_t updateMaxPulsesPerSec(uint16_t max);
+uint8_t updateMaxPulsesPerSecPerSec(uint16_t max);
+uint8_t updateMaxHomingTimeMillis(uint16_t max);
 
 }
 }

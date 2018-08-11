@@ -53,10 +53,10 @@ bool handleMessage() {
 
   if (Debug::DMX::Messages) {
     DMXInterface::debug
-      << PSTR("Command: ")
-      << command
       << PSTR("\tPSpot: ")
       << PinSpot::handleNewBrightness(msg->getPinspot())
+      << PSTR("Command: ")
+      << command
       << PSTR("\tMotor: ")
       << position
       ;
@@ -72,10 +72,66 @@ bool handleMessage() {
   }
 
   if (command == 1) {
-    Motor::updateMaxPulses(position);
+    const auto res = Motor::updateMaxPulses(position);
 
     if (Debug::DMX::Messages) {
-      DMXInterface::debug << PSTR("\tMax updated");
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tMax Pulses updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+      if (res == 2) {
+        DMXInterface::debug << PSTR("\tMax Pulses update rejected");
+      }
+    }
+  }
+
+  if (command == 2) {
+    const auto res = Motor::updateMaxPulsesPerSec(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tMax Pulses perSec updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+      if (res == 2) {
+        DMXInterface::debug << PSTR("\tMax Pulses perSec update rejected");
+      }
+    }
+  }
+
+  if (command == 3) {
+    const auto res = Motor::updateMaxPulsesPerSecPerSec(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tMax Pulses perSec perSec updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+      if (res == 2) {
+        DMXInterface::debug << PSTR("\tMax Pulses perSec perSec update rejected");
+      }
+    }
+  }
+
+  if (command == 4) {
+    const auto res = Motor::updateMaxHomingTimeMillis(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tMax Homeing time updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+      if (res == 2) {
+        DMXInterface::debug << PSTR("\tMax Homeing time update rejected");
+      }
     }
   }
 
