@@ -338,10 +338,9 @@ void messageLoop() {
       if (shutdownPos <= Motor::absoluteMaxPulses) {
         DMXInterface::debug << PSTR("Moving to default location") << endl;
         Motor::handleNewPosition(shutdownPos, false);
-
-        if (disableMotorOnShutdown) {
-          motorShutdown = true;
-        }
+      }
+      if (disableMotorOnShutdown) {
+        motorShutdown = true;
       }
 
       off = true;
