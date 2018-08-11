@@ -135,6 +135,32 @@ bool handleMessage() {
     }
   }
 
+  if (command == 5) {
+    const auto res = Motor::updateAutoHomeDelay(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tAuto Home Delay updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+    }
+  }
+
+  if (command == 6) {
+    const auto res = Motor::updateHomeOnMessage(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tHome on Message updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+    }
+  }
+
   if (command == 0xff) {
     const auto res = Motor::home(false);
 

@@ -50,10 +50,12 @@ extern uint16_t maxHomingTimeMillis;
 constexpr uint16_t defaultMaxHomingTimeMillis = 25000;
 constexpr uint16_t absoluteMaxHomingTimeMillis = 65000;
 
-constexpr bool homeOnMessage = true;
+extern bool homeOnMessage;
+constexpr bool homeOnMessageDefault = true;
 
 // 0 == off
-constexpr uint16_t autoHomeDelay = 0;
+extern uint16_t autoHomeDelay;
+constexpr uint16_t autoHomeDelayDefault = 0;
 
 void setup();
 /**
@@ -91,6 +93,19 @@ uint8_t updateMaxPulsesPerSecPerSec(uint16_t max);
  */ 
 uint8_t updateMaxHomingTimeMillis(uint16_t max);
 
+/**
+ * Update live and saved values
+ * 
+ * @return 0 updated. 1 no change. 2 invalid value
+ */ 
+uint8_t updateAutoHomeDelay(const uint16_t delay);
+
+/**
+ * Update live and saved values
+ * 
+ * @return 0 updated. 1 no change. 2 invalid value
+ */ 
+uint8_t updateHomeOnMessage(const bool hom);
 }
 }
 

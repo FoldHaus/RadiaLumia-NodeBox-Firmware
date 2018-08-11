@@ -22,6 +22,12 @@ uint16_t Motor::maxPulsesPerSecSec;
 uint16_t EEMEM maxHomingTimeMillisEE = defaultMaxHomingTimeMillis;
 uint16_t Motor::maxHomingTimeMillis;
 
+uint8_t EEMEM homeOnMessageEE = homeOnMessageDefault;
+bool Motor::homeOnMessage;
+
+uint16_t EEMEM autoHomeDelayEE = autoHomeDelayDefault;
+uint16_t Motor::autoHomeDelay;
+
 enum class State : u1 {
   Init,
   Homing,
@@ -87,6 +93,26 @@ void Motor::setup() {
     DMXInterface::debug << PSTR("Homing time limit loaded from EEPROM: ") << ee << endl;
   }
 
+  ee = eeprom_read_byte(&homeOnMessageEE);
+
+  if (reset) {
+    eeprom_write_byte(&homeOnMessageEE, homeOnMessage = homeOnMessageDefault);
+    DMXInterface::debug << PSTR("Homing on message set to default") << endl;
+  } else {
+    homeOnMessage = ee;
+    DMXInterface::debug << PSTR("Homing on message loaded from EEPROM: ") << ee << endl;
+  }
+
+  ee = eeprom_read_word(&autoHomeDelayEE);
+
+  if (reset) {
+    eeprom_write_word(&autoHomeDelayEE, autoHomeDelay = autoHomeDelayDefault);
+    DMXInterface::debug << PSTR("Autohoming set to default") << endl;
+  } else {
+    autoHomeDelay = ee;
+    DMXInterface::debug << PSTR("Autohoming loaded from EEPROM: ") << ee << endl;
+  }
+
   homeStartedAt = millis();
 
 }
@@ -126,6 +152,20 @@ uint8_t Motor::updateMaxHomingTimeMillis(const uint16_t max) {
   if (maxHomingTimeMillis == max) return 1;
 
   eeprom_write_word(&maxHomingTimeMillisEE, maxHomingTimeMillis = max);
+  return 0;
+}
+
+uint8_t Motor::updateAutoHomeDelay(const uint16_t delay) {
+  if (autoHomeDelay == delay) return 1;
+
+  eeprom_write_word(&autoHomeDelayEE, autoHomeDelay = delay);
+  return 0;
+}
+
+uint8_t Motor::updateHomeOnMessage(const bool hom) {
+  if (homeOnMessage == hom) return 1;
+
+  eeprom_write_byte(&homeOnMessageEE, homeOnMessage = hom);
   return 0;
 }
 
