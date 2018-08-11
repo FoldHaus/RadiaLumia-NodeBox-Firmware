@@ -34,6 +34,8 @@ constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pul
 constexpr unsigned long maxPulsesPerSecond = (maxRPM/60) * pulsesPerRevolution / (1 + overstep);
 constexpr unsigned long maxPulsesPerSecSec = maxAccel / (1 + overstep);
 
+constexpr unsigned long maxHomingTimeMillis = 25000;
+
 void setup();
 void home();
 void printPositionIfChanged();

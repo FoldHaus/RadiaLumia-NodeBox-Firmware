@@ -76,7 +76,7 @@ void Motor::printPositionIfChanged() {
 void Motor::loop() {
 
   if (state == State::Homing) {
-    if (millis() - homeStartedAt > 25000) {
+    if (millis() - homeStartedAt > maxHomingTimeMillis) {
       state = State::Normal;
       stepper1.setCurrentPosition(0);
       stepper1.enableOutputs();
