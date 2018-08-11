@@ -40,9 +40,6 @@ void Motor::setup() {
   stepper1.setPinsInverted(true, false, false);
   stepper1.setOverstepCount(overstep);
 
-  stepper1.setMaxSpeed(maxPulsesPerSecond);
-  stepper1.setAcceleration(maxPulsesPerSecSec);
-
   auto ee = eeprom_read_word(&maxPulsesEE);
 
   if (ee > absoluteMaxPulses) {
@@ -62,6 +59,7 @@ void Motor::setup() {
     maxPulsesPerSecond = ee;
     DMXInterface::debug << PSTR("PulsePerSec limit loaded from EEPROM: ") << ee << endl;
   }
+  stepper1.setMaxSpeed(maxPulsesPerSecond);
 
   ee = eeprom_read_word(&maxPulsesPerSecSecEE);
 
@@ -72,6 +70,7 @@ void Motor::setup() {
     maxPulsesPerSecSec = ee;
     DMXInterface::debug << PSTR("PulsePerSecSec limit loaded from EEPROM: ") << ee << endl;
   }
+  stepper1.setAcceleration(maxPulsesPerSecSec);
 
   ee = eeprom_read_word(&maxHomingTimeMillisEE);
 
