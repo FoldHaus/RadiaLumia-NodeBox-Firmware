@@ -23,12 +23,15 @@ constexpr unsigned int overstep = 7;
 // 108.3k counts ~ range for hexa-nodes
 // 86.5k counts ~ range for penta-nodes
 // 98k counts ~ range for test rig
-constexpr unsigned long countsToOpen = 108300;
+constexpr unsigned long defaultCountsToOpen = 86500;
+constexpr unsigned long absoluteMaxCounts = 120000;
 
 constexpr unsigned long backoffCounts = 1200;
 
 // Full range in pulses
-constexpr unsigned long maxPulses = pulsesPerRevolution * (countsToOpen - backoffCounts) / countsPerRevolution / (1 + overstep);
+extern unsigned long maxPulses;
+constexpr unsigned long defaultMaxPulses = pulsesPerRevolution * (defaultCountsToOpen - backoffCounts) / countsPerRevolution / (1 + overstep);
+constexpr unsigned long absoluteMaxPulses = pulsesPerRevolution * (absoluteMaxCounts) / countsPerRevolution / (1 + overstep);
 constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution / (1 + overstep);
 
 constexpr unsigned long maxPulsesPerSecond = (maxRPM/60) * pulsesPerRevolution / (1 + overstep);
@@ -42,6 +45,7 @@ void printPositionIfChanged();
 void loop();
 void selfTest();
 long handleNewPosition(unsigned long position);
+void updateMaxPulses(unsigned long max);
 
 }
 }

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
+#include <avr/eeprom.h>
 
 #include "Board.h"
 #include "Debug.h"
@@ -8,7 +9,11 @@
 #include "util.h"
 
 using namespace FoldHaus;
+using namespace Motor;
 
+unsigned long EEMEM maxPulsesEE;
+
+unsigned long Motor::maxPulses;
 
 enum class State : u1 {
   Init,
@@ -30,8 +35,26 @@ void Motor::setup() {
 
   stepper1.setMaxSpeed(maxPulsesPerSecond);
   stepper1.setAcceleration(maxPulsesPerSecSec);
+
+  const auto ee = eeprom_read_dword(&maxPulsesEE);
+
+  if (ee > absoluteMaxPulses) {
+    eeprom_write_dword(&maxPulsesEE, maxPulses = defaultMaxPulses);
+  } else {
+    maxPulses = ee;
+  }
   
   DMXInterface::debug << PSTR("Pulse limit: ") << maxPulses << endl;
+  
+  DMXInterface::debug << PSTR("Absolute limit: ") << absoluteMaxPulses << endl;
+}
+
+void Motor::updateMaxPulses(const unsigned long max) {
+  if (max > absoluteMaxPulses) return;
+
+  if (maxPulses == max) return;
+
+  eeprom_write_dword(&maxPulsesEE, maxPulses = max);
 }
 
 unsigned long homeStartedAt;
