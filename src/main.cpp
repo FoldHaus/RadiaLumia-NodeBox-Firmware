@@ -135,6 +135,22 @@ bool handleMessage() {
     }
   }
 
+  if (command == 0xff) {
+    const auto res = Motor::home(false);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tHomeing Started");
+      }
+      else if (res == 1) {
+        DMXInterface::debug << PSTR("\tAlready Homeing");
+      }
+      else {
+        DMXInterface::debug << PSTR("\tHoming Error: ") << res;
+      }
+    }
+  }
+
   // Don't forget to finish out output lines
   if (Debug::DMX::Messages) {
     DMXInterface::debug << endl;
