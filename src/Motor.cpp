@@ -30,6 +30,8 @@ void Motor::setup() {
 
   stepper1.setMaxSpeed(maxPulsesPerSecond);
   stepper1.setAcceleration(maxPulsesPerSecSec);
+  
+  DMXInterface::debug << PSTR("Pulse limit: ") << maxPulses << endl;
 }
 
 unsigned long homeStartedAt;
