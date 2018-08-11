@@ -17,6 +17,7 @@ constexpr unsigned long rotationsPerInch  = 4;  //must be set per lead screw pit
 constexpr unsigned long pulsesPerRevolution = 200; //must be set to this in the Clearpath firmware
 constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
 
+// This relates to a hack inside of the local copy of AccelStepper
 constexpr unsigned int overstep = 7;
 
 // 108.3k counts ~ range for hexa-nodes
