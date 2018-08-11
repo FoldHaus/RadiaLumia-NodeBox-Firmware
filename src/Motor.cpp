@@ -42,7 +42,6 @@ void Motor::home() {
   if (Board::Feedback::isActive()) {
     DMXInterface::debug << PSTR("Short on HLFB or motor missconfigured") << endl;
     Board::DebugLED::on();
-    while(1);
   }
 
   digitalWrite(Board::EnablePin, HIGH);
@@ -54,8 +53,6 @@ void Motor::home() {
     DMXInterface::debug << PSTR("No Motor Present") << endl;
 
     Board::DebugLED::on();
-
-    while(1);
   }
   
   delay(25 * 1000);
