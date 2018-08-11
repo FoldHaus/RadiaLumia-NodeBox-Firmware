@@ -50,6 +50,8 @@ extern uint16_t maxHomingTimeMillis;
 constexpr uint16_t defaultMaxHomingTimeMillis = 25000;
 constexpr uint16_t absoluteMaxHomingTimeMillis = 65000;
 
+constexpr bool homeOnMessage = true;
+
 void setup();
 /**
  * Home unless already homing.

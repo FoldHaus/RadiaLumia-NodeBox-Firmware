@@ -252,7 +252,7 @@ void Motor::selfTest() {
 long Motor::handleNewPosition(uint16_t position) {
 
   // Home when we get any position message but are not already homed.
-  if (state == State::Init) {
+  if (homeOnMessage && state == State::Init) {
     home();
     return 0;
   }
