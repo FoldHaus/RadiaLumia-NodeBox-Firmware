@@ -18,7 +18,8 @@ namespace FoldHaus {
  * Internal block of bytes we're wrapping around
  */
 typedef struct {
-  uint32_t command :24;
+  uint8_t command;
+  uint16_t motor;
   uint8_t pinspot;
 } DMXDataShape;
 
@@ -59,6 +60,10 @@ public:
 
     inline typeof(data.command) getCommand() const {
       return data.command;
+    }
+
+    inline typeof(data.motor) getMotor() const {
+      return data.motor;
     }
 
     inline typeof(data.pinspot) getPinspot() const {

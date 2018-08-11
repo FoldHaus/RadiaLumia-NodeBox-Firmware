@@ -48,26 +48,38 @@ bool handleMessage() {
   if (!msg) return false;
   // DebugLED::on();
 
-  unsigned long position = msg->getCommand();
+  const auto command = msg->getCommand();
+  unsigned long position = msg->getMotor();
 
   if (Debug::DMX::Messages) {
     DMXInterface::debug
-      << PSTR("PSpot: ")
+      << PSTR("Command: ")
+      << command
+      << PSTR("\tPSpot: ")
       << PinSpot::handleNewBrightness(msg->getPinspot())
       << PSTR("\tMotor: ")
       << position
       ;
   }
 
-  auto delta = Motor::handleNewPosition(position);
+  if (command == 0) {
+    auto delta = Motor::handleNewPosition(position);
 
-  // Might as well only print deltas when they're non-zero
-  if (Debug::DMX::Messages && delta) {
-    DMXInterface::debug << PSTR("\tDelta: ") << delta;
+    // Might as well only print deltas when they're non-zero
+    if (Debug::DMX::Messages && delta) {
+      DMXInterface::debug << PSTR("\tDelta: ") << delta;
+    }
+  }
+
+  if (command == 1) {
+    Motor::updateMaxPulses(position);
+
+    if (Debug::DMX::Messages) {
+      DMXInterface::debug << PSTR("\tMax updated");
+    }
   }
 
   // Don't forget to finish out output lines
-  
   if (Debug::DMX::Messages) {
     DMXInterface::debug << endl;
   }
