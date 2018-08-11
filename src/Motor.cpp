@@ -152,6 +152,8 @@ long Motor::handleNewPosition(unsigned long position) {
     return;
   }
 
+  if (state != State::Normal) return;
+
   static unsigned long lastPosition = 0;
   static bool activeWarning = false;
 
