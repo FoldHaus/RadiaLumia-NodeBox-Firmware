@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <avr/eeprom.h>
 
 #include "Board.h"
 #include "Debug.h"
@@ -8,6 +9,21 @@
 #include "util.h"
 
 using namespace FoldHaus;
+
+uint16_t shutdownPos;
+uint16_t shutdownPosDefault = 0;
+uint16_t shutdownPosMax = Motor::absoluteMaxPulses + 1;
+uint16_t EEMEM shutdownPosEE = shutdownPosDefault;
+
+uint16_t shutdownTime;
+constexpr uint16_t shutdownTimeDefault = 10000;
+constexpr uint16_t shutdownTimeMax = 30000;
+uint16_t EEMEM shutdownTimeEE = shutdownTimeDefault;
+
+bool disableMotorOnShutdown;
+constexpr uint16_t disableMotorOnShutdownDefault = false;
+uint8_t EEMEM disableMotorOnShutdownEE = disableMotorOnShutdownDefault;
+
 
 using namespace Board;
 
@@ -31,6 +47,36 @@ void setup() {
   
   Motor::setup();
 
+  auto ee = eeprom_read_word(&shutdownPosEE);
+
+  if (Board::DebugButton::isActive() || ee > shutdownPosMax) {
+    eeprom_write_word(&shutdownPosEE, shutdownPos = shutdownPosDefault);
+    DMXInterface::debug << PSTR("Close on timeout set to default") << endl;
+  } else {
+    shutdownPos = ee;
+    DMXInterface::debug << PSTR("Close on timeout loaded from EEPROM: ") << ee << endl;
+  }
+
+  ee = eeprom_read_word(&shutdownTimeEE);
+
+  if (Board::DebugButton::isActive() || ee > shutdownTimeMax) {
+    eeprom_write_word(&shutdownTimeEE, shutdownTime = shutdownTimeDefault);
+    DMXInterface::debug << PSTR("Shutdown time set to default") << endl;
+  } else {
+    shutdownTime = ee;
+    DMXInterface::debug << PSTR("Shutdown time loaded from EEPROM: ") << ee << endl;
+  }
+
+  ee = eeprom_read_byte(&disableMotorOnShutdownEE);
+
+  if (Board::DebugButton::isActive() || ee == 0xff) {
+    eeprom_write_byte(&disableMotorOnShutdownEE, disableMotorOnShutdown = disableMotorOnShutdownDefault);
+    DMXInterface::debug << PSTR("Shutdown time set to default") << endl;
+  } else {
+    disableMotorOnShutdown = ee;
+    DMXInterface::debug << PSTR("Shutdown time loaded from EEPROM: ") << ee << endl;
+  }
+
   // Delay some more for no real reason
   delay(1000);
 
@@ -39,6 +85,31 @@ void setup() {
 
   // Turn off led to indicate end of init
   DebugLED::off();
+}
+
+uint8_t updateShutdownPosition(const uint16_t pos) {
+  if (pos > shutdownPosMax) return 2;
+
+  if (shutdownPos == pos) return 1;
+
+  eeprom_write_word(&shutdownPosEE, shutdownPos = pos);
+  return 0;
+}
+
+uint8_t updateShutdownTime(const uint16_t time) {
+  if (time > shutdownTimeMax) return 2;
+
+  if (shutdownTime == time) return 1;
+
+  eeprom_write_word(&shutdownTimeEE, shutdownTime = time);
+  return 0;
+}
+
+uint8_t updateMotorShutdownOnShutdown(const bool val) {
+  if (disableMotorOnShutdown == val) return 1;
+
+  eeprom_write_byte(&disableMotorOnShutdownEE, disableMotorOnShutdown = val);
+  return 0;
 }
 
 bool handleMessage() {
@@ -161,6 +232,51 @@ bool handleMessage() {
     }
   }
 
+  if (command == 10) {
+    const auto res = updateShutdownPosition(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tShutdown position updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+      if (res == 2) {
+        DMXInterface::debug << PSTR("\tShutdown position update rejected");
+      }
+    }
+  }
+
+  if (command == 11) {
+    const auto res = updateShutdownTime(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tShutdown Timeout updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+      if (res == 2) {
+        DMXInterface::debug << PSTR("\tShutdown Timeout update rejected");
+      }
+    }
+  }
+
+  if (command == 12) {
+    const auto res = updateMotorShutdownOnShutdown(position);
+
+    if (Debug::DMX::Messages) {
+      if (res == 0) {
+        DMXInterface::debug << PSTR("\tMotor Shutdown On Shutdown updated");
+      }
+      if (res == 1) {
+        DMXInterface::debug << PSTR("\tNo Change");
+      }
+    }
+  }
+
   if (command == 0xff) {
     const auto res = Motor::home(false);
 
@@ -191,23 +307,39 @@ void messageLoop() {
   // Timeout flag defaults to on
   static bool timeout = false;
   static bool off = true;
+  static bool motorShutdown = false;
 
   // If we've just received a valid message, mark the time. No Timeout! Yay!
   if (handleMessage()) {
     lastMessageTime = millis();
     timeout = false;
     off = false;
+    motorShutdown = false;
   } else {
-    // If we've gone 10 seconds since a message, turn off pinspot
-    if (!off && millis() - lastMessageTime >= 10 * 1000) {
+    // If we've gone a while since a message, shutdown
+    if (!off && millis() - lastMessageTime >= shutdownTime) {
       DMXInterface::debug << PSTR("Shutting down pinspot for safety") << endl;
       PinSpot::handleNewBrightness(0);
+
+      if (shutdownPos <= Motor::absoluteMaxPulses) {
+        DMXInterface::debug << PSTR("Moving to default location") << endl;
+        Motor::handleNewPosition(shutdownPos, false);
+
+        if (disableMotorOnShutdown) {
+          motorShutdown = true;
+        }
+      }
+
       off = true;
     }
     // If we've gone 0.25 seconds since a message, indicate timeout but don't spam
     if (!timeout && millis() - lastMessageTime >= 250) {
       DMXInterface::debug << PSTR("Timeout") << endl;
       timeout = true;
+    }
+    if (motorShutdown && !Motor::isMoving()) {
+      Motor::disable();
+      motorShutdown = false;
     }
   }
 }

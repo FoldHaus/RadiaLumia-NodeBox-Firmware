@@ -244,9 +244,7 @@ void Motor::loop() {
   printPositionIfChanged();
 
   if (state == State::Normal && !Board::Feedback::isActive()) {
-    state = State::Init;
-    digitalWrite(Board::EnablePin, LOW);
-    stepper1.disableOutputs();
+    disable();
     DMXInterface::debug << PSTR("Fault! At: ") << stepper1.currentPosition() << endl;
     delay(3000);
   }
@@ -300,10 +298,10 @@ void Motor::selfTest() {
   handleNewPosition(next);
 }
 
-long Motor::handleNewPosition(uint16_t position) {
+long Motor::handleNewPosition(uint16_t position, bool allowHomeOnMessage) {
 
   // Home when we get any position message but are not already homed.
-  if (homeOnMessage && state == State::Init) {
+  if (allowHomeOnMessage && homeOnMessage && state == State::Init) {
     home();
     return 0;
   }
@@ -335,4 +333,14 @@ long Motor::handleNewPosition(uint16_t position) {
   lastPosition = position;
 
   return delta;
+}
+
+bool Motor::isMoving() {
+  return stepper1.isRunning();
+}
+
+void Motor::disable() {
+  state = State::Init;
+  digitalWrite(Board::EnablePin, LOW);
+  stepper1.disableOutputs();
 }

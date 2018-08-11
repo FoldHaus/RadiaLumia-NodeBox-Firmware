@@ -67,7 +67,7 @@ uint8_t home(bool verbose = true);
 void printPositionIfChanged();
 void loop();
 void selfTest();
-long handleNewPosition(uint16_t position);
+long handleNewPosition(uint16_t position, bool allowHomeOnMessage = true);
 /**
  * Update live and saved values
  * 
@@ -106,6 +106,9 @@ uint8_t updateAutoHomeDelay(const uint16_t delay);
  * @return 0 updated. 1 no change. 2 invalid value
  */ 
 uint8_t updateHomeOnMessage(const bool hom);
+
+bool isMoving();
+void disable();
 }
 }
 
