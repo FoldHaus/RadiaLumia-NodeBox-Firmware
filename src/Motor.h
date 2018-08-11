@@ -52,6 +52,9 @@ constexpr uint16_t absoluteMaxHomingTimeMillis = 65000;
 
 constexpr bool homeOnMessage = true;
 
+// 0 == off
+constexpr uint16_t autoHomeDelay = 0;
+
 void setup();
 /**
  * Home unless already homing.

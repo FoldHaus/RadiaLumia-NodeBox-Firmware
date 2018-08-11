@@ -33,6 +33,8 @@ State state = State::Init;
 // Setup stepper, but don't initialize the outputs
 AccelStepper stepper1(AccelStepper::DRIVER, Board::StepPin, Board::DirectionPin, 0xff, 0xff, false);
 
+unsigned long homeStartedAt;
+
 void Motor::setup() {
   digitalWrite(Board::EnablePin, LOW);
   pinMode(Board::EnablePin, OUTPUT);
@@ -82,6 +84,8 @@ void Motor::setup() {
     DMXInterface::debug << PSTR("Homing time limit loaded from EEPROM: ") << ee << endl;
   }
 
+  homeStartedAt = millis();
+
 }
 
 uint8_t Motor::updateMaxPulses(const uint16_t max) {
@@ -121,8 +125,6 @@ uint8_t Motor::updateMaxHomingTimeMillis(const uint16_t max) {
   eeprom_write_word(&maxHomingTimeMillisEE, maxHomingTimeMillis = max);
   return 0;
 }
-
-unsigned long homeStartedAt;
 
 uint8_t Motor::home(bool verbose) {
   if (state == State::Homing) return 1;
@@ -177,7 +179,13 @@ void Motor::printPositionIfChanged() {
 }
 
 void Motor::loop() {
-  if (state == State::Init) return;
+  if (state == State::Init) {
+    if (autoHomeDelay && millis() - homeStartedAt > autoHomeDelay) {
+      DMXInterface::debug << PSTR("Starutp Auto Home") << endl;
+      home(false);
+    }
+    return;
+  }
 
   if (state == State::Homing) {
     if (millis() - homeStartedAt > maxHomingTimeMillis) {
