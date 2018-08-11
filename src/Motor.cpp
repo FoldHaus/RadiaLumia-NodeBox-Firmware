@@ -99,6 +99,7 @@ uint8_t Motor::updateMaxPulsesPerSec(const uint16_t max) {
   if (maxPulsesPerSecond == max) return 1;
 
   eeprom_write_word(&maxPulsesPerSecondEE, maxPulsesPerSecond = max);
+  stepper1.setMaxSpeed(maxPulsesPerSecond);
   return 0;
 }
 
@@ -108,6 +109,7 @@ uint8_t Motor::updateMaxPulsesPerSecPerSec(const uint16_t max) {
   if (maxPulsesPerSecSec == max) return 1;
 
   eeprom_write_word(&maxPulsesPerSecSecEE, maxPulsesPerSecSec = max);
+  stepper1.setAcceleration(maxPulsesPerSecSec);
   return 0;
 }
 
