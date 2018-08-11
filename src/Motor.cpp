@@ -42,9 +42,12 @@ void Motor::setup() {
   stepper1.setPinsInverted(true, false, false);
   stepper1.setOverstepCount(overstep);
 
+  // Force clear with button held on startup
+  bool reset = Board::DebugButton::isActive();
+
   auto ee = eeprom_read_word(&maxPulsesEE);
 
-  if (ee > absoluteMaxPulses) {
+  if (reset || ee > absoluteMaxPulses) {
     eeprom_write_word(&maxPulsesEE, maxPulses = defaultMaxPulses);
     DMXInterface::debug << PSTR("Pulse limit set to default") << endl;
   } else {
@@ -54,7 +57,7 @@ void Motor::setup() {
 
   ee = eeprom_read_word(&maxPulsesPerSecondEE);
 
-  if (ee > absoluteMaxPulsesPerSecond) {
+  if (reset || ee > absoluteMaxPulsesPerSecond) {
     eeprom_write_word(&maxPulsesPerSecondEE, maxPulsesPerSecond = defaultMaxPulsesPerSecond);
     DMXInterface::debug << PSTR("PulsePerSec limit set to default") << endl;
   } else {
@@ -65,7 +68,7 @@ void Motor::setup() {
 
   ee = eeprom_read_word(&maxPulsesPerSecSecEE);
 
-  if (ee > absoluteMaxPulsesPerSecSec) {
+  if (reset || ee > absoluteMaxPulsesPerSecSec) {
     eeprom_write_word(&maxPulsesPerSecSecEE, maxPulsesPerSecSec = defaultMaxPulsesPerSecSec);
     DMXInterface::debug << PSTR("PulsePerSecSec limit set to default") << endl;
   } else {
@@ -76,7 +79,7 @@ void Motor::setup() {
 
   ee = eeprom_read_word(&maxHomingTimeMillisEE);
 
-  if (ee > absoluteMaxHomingTimeMillis) {
+  if (reset || ee > absoluteMaxHomingTimeMillis) {
     eeprom_write_word(&maxHomingTimeMillisEE, maxHomingTimeMillis = defaultMaxHomingTimeMillis);
     DMXInterface::debug << PSTR("Homing time limit set to default") << endl;
   } else {
