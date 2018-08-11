@@ -1,54 +1,17 @@
 #include <Arduino.h>
-#include <AccelStepper.h>
 
 #include "Board.h"
-
-#include "testPinSpot.h"
-
+#include "Debug.h"
 #include "DMXInterface.h"
+#include "Motor.h"
+#include "PinSpot.h"
+#include "util.h"
 
-using namespace Foldhaus;
+using namespace FoldHaus;
 
 using namespace Board;
 
-// "Pulses" are traditional stepper motor steps (Tied to "Input Resolution")
-// "Counts" are clearpath internal encoder counts (fixed at 800)
-
-constexpr unsigned long maxRPM            = 2000;
-constexpr unsigned long maxAccel          = 8000;
-
-constexpr unsigned long maxTravelInches   = 28; // Old and possibly wrong
-constexpr unsigned long rotationsPerInch  = 4;  //must be set per lead screw pitch
-
-constexpr unsigned long pulsesPerRevolution = 200; //must be set to this in the Clearpath firmware
-constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
-
-constexpr unsigned int overstep = 7;
-
-// 108.3k counts ~ range for hexa-nodes
-// 86.5k counts ~ range for penta-nodes
-// 98k counts ~ range for test rig
-constexpr unsigned long countsToOpen = 108300;
-
-constexpr unsigned long backoffCounts = 1200;
-
-// Full range in pulses
-constexpr unsigned long maxPulses = pulsesPerRevolution * (countsToOpen - backoffCounts) / countsPerRevolution / (1 + overstep);
-constexpr unsigned long maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution / (1 + overstep);
-
-constexpr unsigned long maxPulsesPerSecond = (maxRPM/60) * pulsesPerRevolution / (1 + overstep);
-constexpr unsigned long maxPulsesPerSecSec = maxAccel / (1 + overstep);
-
-enum class State : u1 {
-  Init,
-  Homing,
-  Normal,
-};
-
-State state = State::Init;
-
 // const char endl[] PROGMEM = "\r\n";
-constexpr char endl = '\n';
 
 void setup() {
   // Initialize blip on LED
@@ -64,9 +27,9 @@ void setup() {
   // Tell the world we're alive
   DMXInterface::debug << PSTR("Setup") << endl;
 
-  setupPinspot();
+  PinSpot::setup();
   
-  setupMotorWithAccelStepperLib();
+  Motor::setup();
 
   // Delay some more for no real reason
   delay(1000);
@@ -74,7 +37,7 @@ void setup() {
   // Tell the world we're all set
   DMXInterface::debug << PSTR("Init complete") << endl;
 
-  DMXInterface::debug << PSTR("Count limit: ") << countsToOpen << PSTR(" Pulse limit: ") << maxPulses << endl;
+  DMXInterface::debug << PSTR("Count limit: ") << Motor::countsToOpen << PSTR(" Pulse limit: ") << Motor::maxPulses << endl;
 
   // Turn off led to indicate end of init
   DebugLED::off();
@@ -92,13 +55,13 @@ bool handleMessage() {
   if (Debug::DMX::Messages) {
     DMXInterface::debug
       << PSTR("PSpot: ")
-      << handleNewPinSpotBrightness(msg->getPinspot())
+      << PinSpot::handleNewBrightness(msg->getPinspot())
       << PSTR("\tMotor: ")
       << position
       ;
   }
 
-  auto delta = handleNewMotorPosition(position);
+  auto delta = Motor::handleNewPosition(position);
 
   // Might as well only print deltas when they're non-zero
   if (Debug::DMX::Messages && delta) {
@@ -115,7 +78,7 @@ bool handleMessage() {
   return true;
 }
 
-void loopDoMain() {
+void messageLoop() {
   static unsigned long lastMessageTime = 0;
   // Timeout flag defaults to on
   static bool timeout = false;
@@ -126,15 +89,11 @@ void loopDoMain() {
     lastMessageTime = millis();
     timeout = false;
     off = false;
-
-    if (state == State::Init) {
-      home();
-    }
   } else {
     // If we've gone 10 seconds since a message, turn off pinspot
     if (!off && millis() - lastMessageTime >= 10 * 1000) {
       DMXInterface::debug << PSTR("Shutting down pinspot for safety") << endl;
-      handleNewPinSpotBrightness(0);
+      PinSpot::handleNewBrightness(0);
       off = true;
     }
     // If we've gone 0.25 seconds since a message, indicate timeout but don't spam
@@ -143,30 +102,20 @@ void loopDoMain() {
       timeout = true;
     }
   }
-
-  if (state == State::Normal && !Feedback::isActive()) {
-    state = State::Init;
-    digitalWrite(EnablePin, LOW);
-    stepper1.disableOutputs();
-    DMXInterface::debug << PSTR("Fault! At: ") << stepper1.currentPosition() << endl;
-    delay(3000);
-  }
 }
 
 void loop() {
 
-  loopDoDebug();
-
-  loopDoMain();
+  messageLoop();
 
   // Call the non-blocking pinspot main
-  loopDoPinSpot();
+  PinSpot::loop();
 
   // Call non-blocking stepper main
-  loopDoMotor();
+  Motor::loop();
 
-  // testPinSpot();
-  // testMotorSteps();
+  // PinSpot::selfTest();
+  // Motor::selfTest();
 
   // Toggle the pinspot on and off
   // digitalWrite(PinSpot, millis() % 3000 < 1000 ? HIGH : LOW);

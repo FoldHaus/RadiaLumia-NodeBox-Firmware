@@ -5,7 +5,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-
+namespace FoldHaus {
 namespace Debug {
   namespace DMX {
     constexpr bool Messages = true;
@@ -18,6 +18,7 @@ namespace Debug {
   namespace PinSpot {
     constexpr bool TestWithButton = true;
   }
+}
 }
 
 #endif

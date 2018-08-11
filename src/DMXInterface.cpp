@@ -8,7 +8,7 @@
 
 #include <CRC8.h>
 
-using namespace Foldhaus;
+using namespace FoldHaus;
 using namespace libCameron;
 using namespace Board;
 

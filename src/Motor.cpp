@@ -1,11 +1,29 @@
+#include <Arduino.h>
+#include <AccelStepper.h>
 
+#include "Board.h"
+#include "Debug.h"
+#include "DMXInterface.h"
+#include "Motor.h"
+#include "util.h"
+
+using namespace FoldHaus;
+
+
+enum class State : u1 {
+  Init,
+  Homing,
+  Normal,
+};
+
+State state = State::Init;
 
 // Setup stepper, but don't initialize the outputs
-AccelStepper stepper1(AccelStepper::DRIVER, StepPin, DirectionPin, 0xff, 0xff, false);
+AccelStepper stepper1(AccelStepper::DRIVER, Board::StepPin, Board::DirectionPin, 0xff, 0xff, false);
 
-void setupMotorWithAccelStepperLib() {
-  digitalWrite(EnablePin, LOW);
-  pinMode(EnablePin, OUTPUT);
+void Motor::setup() {
+  digitalWrite(Board::EnablePin, LOW);
+  pinMode(Board::EnablePin, OUTPUT);
 
   stepper1.setPinsInverted(true, false, false);
   stepper1.setOverstepCount(overstep);
@@ -14,10 +32,10 @@ void setupMotorWithAccelStepperLib() {
   stepper1.setAcceleration(maxPulsesPerSecSec);
 }
 
-void home() {
+void Motor::home() {
   state = State::Homing;
 
-  digitalWrite(EnablePin, LOW);
+  digitalWrite(Board::EnablePin, LOW);
   
   delay(10);
 
@@ -27,7 +45,7 @@ void home() {
     while(1);
   }
 
-  digitalWrite(EnablePin, HIGH);
+  digitalWrite(Board::EnablePin, HIGH);
   DMXInterface::debug << PSTR("Homing") << endl;
 
   delay(100);
@@ -48,7 +66,7 @@ void home() {
   DMXInterface::debug << PSTR("Homed") << endl;
 }
 
-void printPositionIfChanged() {
+void Motor::printPositionIfChanged() {
   static typeof(stepper1.currentPosition()) last = -1;
 
   auto const pos = stepper1.currentPosition();
@@ -62,15 +80,45 @@ void printPositionIfChanged() {
   }
 }
 
-inline void loopDoMotor() {
+void Motor::loop() {
+  
   stepper1.run();
   printPositionIfChanged();
+
+  if (state == State::Normal && !Board::Feedback::isActive()) {
+    state = State::Init;
+    digitalWrite(Board::EnablePin, LOW);
+    stepper1.disableOutputs();
+    DMXInterface::debug << PSTR("Fault! At: ") << stepper1.currentPosition() << endl;
+    delay(3000);
+  }
   
   // Test the motor's Feedback line
   // DebugLED::set(digitalRead(Feedback) == LOW);
+
+  if (Debug::Motor::TestWithButton) {
+
+    if (Board::DebugButton::isActive()) {
+      if (state == State::Init) {
+        home();
+      }
+      else
+
+      if (state == State::Normal) {
+        if (!stepper1.isRunning()) {
+          DMXInterface::debug << PSTR("Test Move") << endl;
+          selfTest();
+        } else {
+          DMXInterface::debug << PSTR("Already moving. Rejected") << endl;
+        }
+      }
+    }
+    while (Board::DebugButton::isActive());
+    delay(10);
+  }
 }
 
-void testMotorSteps() {
+void Motor::selfTest() {
   static bool toggle = false;
   static unsigned long lastTime = 0;
 
@@ -91,10 +139,16 @@ void testMotorSteps() {
 
   DMXInterface::debug << PSTR("Moving to: ") << next << endl;
 
-  handleNewMotorPosition(next);
+  handleNewPosition(next);
 }
 
-long handleNewMotorPosition(unsigned long position) {
+long Motor::handleNewPosition(unsigned long position) {
+
+  if (state == State::Init) {
+    home();
+    return;
+  }
+
   static unsigned long lastPosition = 0;
   static bool activeWarning = false;
 

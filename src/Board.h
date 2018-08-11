@@ -6,9 +6,10 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <Arduino.h>
 #include <AVR++/IOpin.h>
 
-namespace Foldhaus {
+namespace FoldHaus {
 
 namespace Board {
 

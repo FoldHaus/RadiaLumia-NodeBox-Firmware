@@ -12,7 +12,7 @@
 
 ISR(USART_RX_vect);
 
-namespace Foldhaus {
+namespace FoldHaus {
 
 /**
  * Internal block of bytes we're wrapping around

@@ -1,0 +1,2 @@
+
+constexpr char endl = '\n';
