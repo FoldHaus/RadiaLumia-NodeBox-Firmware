@@ -51,7 +51,12 @@ constexpr uint16_t defaultMaxHomingTimeMillis = 25000;
 constexpr uint16_t absoluteMaxHomingTimeMillis = 65000;
 
 void setup();
-void home();
+/**
+ * Home unless already homing.
+ * 
+ * @return 0 homing. 1 already homing. Other = Error with motor connection
+ */ 
+uint8_t home(bool verbose = true);
 void printPositionIfChanged();
 void loop();
 void selfTest();

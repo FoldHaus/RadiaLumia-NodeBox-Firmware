@@ -124,7 +124,11 @@ uint8_t Motor::updateMaxHomingTimeMillis(const uint16_t max) {
 
 unsigned long homeStartedAt;
 
-void Motor::home() {
+uint8_t Motor::home(bool verbose) {
+  if (state == State::Homing) return 1;
+
+  uint8_t err = 0;
+
   state = State::Homing;
 
   digitalWrite(Board::EnablePin, LOW);
@@ -132,21 +136,30 @@ void Motor::home() {
   delay(10);
 
   if (Board::Feedback::isActive()) {
-    DMXInterface::debug << PSTR("Short on HLFB or motor missconfigured") << endl;
+    if (verbose) {
+      DMXInterface::debug << PSTR("Short on HLFB or motor missconfigured") << endl;
+    }
+    err = 2;
     Board::DebugLED::on();
   }
 
   digitalWrite(Board::EnablePin, HIGH);
   homeStartedAt = millis();
-  DMXInterface::debug << PSTR("Homing") << endl;
+  if (verbose) {
+    DMXInterface::debug << PSTR("Homing") << endl;
+  }
 
   delay(100);
   
   if (!Board::Feedback::isActive()) {
-    DMXInterface::debug << PSTR("No Motor Present") << endl;
-
+    if (verbose) {
+      DMXInterface::debug << PSTR("No Motor Present") << endl;
+    }
+    err = 3;
     Board::DebugLED::on();
   }
+
+  return err;
 }
 
 void Motor::printPositionIfChanged() {
