@@ -151,10 +151,10 @@ long Motor::handleNewPosition(unsigned long position) {
 
   if (state == State::Init) {
     home();
-    return;
+    return 0;
   }
 
-  if (state != State::Normal) return;
+  if (state != State::Normal) return 0;
 
   static unsigned long lastPosition = 0;
   static bool activeWarning = false;
