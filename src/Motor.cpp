@@ -28,6 +28,9 @@ bool Motor::homeOnMessage;
 uint16_t EEMEM autoHomeDelayEE = autoHomeDelayDefault;
 uint16_t Motor::autoHomeDelay;
 
+uint8_t EEMEM overstepEE = overstepDefault;
+uint8_t Motor::overstep;
+
 enum class State : u1 {
   Init,
   Homing,
@@ -46,7 +49,6 @@ void Motor::setup() {
   pinMode(Board::EnablePin, OUTPUT);
 
   stepper1.setPinsInverted(true, false, false);
-  stepper1.setOverstepCount(overstep);
 
   // Force clear with button held on startup
   bool reset = Board::DebugButton::isActive();
@@ -113,6 +115,18 @@ void Motor::setup() {
     DMXInterface::debug << PSTR("Autohoming loaded from EEPROM: ") << ee << endl;
   }
 
+  ee = eeprom_read_byte(&overstepEE);
+
+  if (reset || ee > overstepMax) {
+    eeprom_write_byte(&overstepEE, overstep = overstepDefault);
+    DMXInterface::debug << PSTR("Overstep set to default") << endl;
+  } else {
+    overstep = ee;
+    DMXInterface::debug << PSTR("Overstep loaded from EEPROM: ") << ee << endl;
+  }
+  
+  stepper1.setOverstepCount(overstep);
+
   homeStartedAt = millis();
 
 }
@@ -166,6 +180,16 @@ uint8_t Motor::updateHomeOnMessage(const bool hom) {
   if (homeOnMessage == hom) return 1;
 
   eeprom_write_byte(&homeOnMessageEE, homeOnMessage = hom);
+  return 0;
+}
+
+uint8_t Motor::updateOverstep(const uint8_t max) {
+  if (max > overstepMax) return 2;
+
+  if (overstep == max) return 1;
+
+  eeprom_write_byte(&overstepEE, overstep = max);
+  stepper1.setOverstepCount(overstep);
   return 0;
 }
 

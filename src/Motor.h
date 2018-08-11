@@ -21,7 +21,9 @@ constexpr unsigned long pulsesPerRevolution = 200; //must be set to this in the 
 constexpr unsigned long countsPerRevolution = 800; // Motor encoder resolution
 
 // This relates to a hack inside of the local copy of AccelStepper
-constexpr unsigned int overstep = 7;
+extern uint8_t overstep;
+constexpr uint8_t overstepDefault = 7;
+constexpr uint8_t overstepMax = 10;
 
 // 108.3k counts ~ range for hexa-nodes
 // 86.5k counts ~ range for penta-nodes
@@ -33,18 +35,18 @@ constexpr unsigned long backoffCounts = 1200;
 
 // Full range in pulses
 extern uint16_t maxPulses;
-constexpr uint16_t defaultMaxPulses = (defaultCountsToOpen - backoffCounts) * pulsesPerRevolution / countsPerRevolution / (1 + overstep);
-constexpr uint16_t absoluteMaxPulses = (absoluteMaxCounts) * pulsesPerRevolution / countsPerRevolution / (1 + overstep);
+constexpr uint16_t defaultMaxPulses = (defaultCountsToOpen - backoffCounts) * pulsesPerRevolution / countsPerRevolution / (1 + overstepDefault);
+constexpr uint16_t absoluteMaxPulses = (absoluteMaxCounts) * pulsesPerRevolution / countsPerRevolution / (1 + overstepDefault);
 // Holdover...
-constexpr uint16_t maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution / (1 + overstep);
+constexpr uint16_t maxPulsesCalc = maxTravelInches * rotationsPerInch * pulsesPerRevolution / (1 + overstepDefault);
 
 extern uint16_t maxPulsesPerSecond;
-constexpr uint16_t defaultMaxPulsesPerSecond = (defaultMaxRPM/60) * pulsesPerRevolution / (1 + overstep);
-constexpr uint16_t absoluteMaxPulsesPerSecond = (absoluteMaxRPM/60) * pulsesPerRevolution / (1 + overstep);
+constexpr uint16_t defaultMaxPulsesPerSecond = (defaultMaxRPM/60) * pulsesPerRevolution / (1 + overstepDefault);
+constexpr uint16_t absoluteMaxPulsesPerSecond = (absoluteMaxRPM/60) * pulsesPerRevolution / (1 + overstepDefault);
 
 extern uint16_t maxPulsesPerSecSec;
-constexpr uint16_t defaultMaxPulsesPerSecSec = defaultMaxAccelPPSPS / (1 + overstep);
-constexpr uint16_t absoluteMaxPulsesPerSecSec = absoluteMaxAccelPPSPS / (1 + overstep);
+constexpr uint16_t defaultMaxPulsesPerSecSec = defaultMaxAccelPPSPS / (1 + overstepDefault);
+constexpr uint16_t absoluteMaxPulsesPerSecSec = absoluteMaxAccelPPSPS / (1 + overstepDefault);
 
 extern uint16_t maxHomingTimeMillis;
 constexpr uint16_t defaultMaxHomingTimeMillis = 25000;
@@ -106,6 +108,13 @@ uint8_t updateAutoHomeDelay(const uint16_t delay);
  * @return 0 updated. 1 no change. 2 invalid value
  */ 
 uint8_t updateHomeOnMessage(const bool hom);
+
+/**
+ * Update live and saved values
+ * 
+ * @return 0 updated. 1 no change. 2 invalid value
+ */ 
+uint8_t updateOverstep(const uint8_t overstep);
 }
 }
 
