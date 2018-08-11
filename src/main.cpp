@@ -33,6 +33,11 @@ void setup() {
   // Initialize blip on LED
   DebugLED::on();
 
+  // To make sure things have time to settle,
+  // especially the button for EEPROM reset reasons and
+  // to let the LED be ON for a second
+  delay(1000);
+
   // Enable the external RS485 hardware before enabling serial interface
   pinMode(RS485RxEnable, OUTPUT);
   digitalWrite(RS485RxEnable, LOW);
@@ -48,8 +53,9 @@ void setup() {
   Motor::setup();
 
   auto ee = eeprom_read_word(&shutdownPosEE);
+  const bool reset = Board::DebugButton::isActive();
 
-  if (Board::DebugButton::isActive() || ee > shutdownPosMax) {
+  if (reset || ee > shutdownPosMax) {
     eeprom_write_word(&shutdownPosEE, shutdownPos = shutdownPosDefault);
     DMXInterface::debug << PSTR("Close on timeout set to default") << endl;
   } else {
@@ -59,7 +65,7 @@ void setup() {
 
   ee = eeprom_read_word(&shutdownTimeEE);
 
-  if (Board::DebugButton::isActive() || ee > shutdownTimeMax) {
+  if (reset || ee > shutdownTimeMax) {
     eeprom_write_word(&shutdownTimeEE, shutdownTime = shutdownTimeDefault);
     DMXInterface::debug << PSTR("Shutdown time set to default") << endl;
   } else {
@@ -69,7 +75,7 @@ void setup() {
 
   ee = eeprom_read_byte(&disableMotorOnShutdownEE);
 
-  if (Board::DebugButton::isActive() || ee == 0xff) {
+  if (reset || ee == 0xff) {
     eeprom_write_byte(&disableMotorOnShutdownEE, disableMotorOnShutdown = disableMotorOnShutdownDefault);
     DMXInterface::debug << PSTR("Shutdown time set to default") << endl;
   } else {
@@ -77,11 +83,16 @@ void setup() {
     DMXInterface::debug << PSTR("Shutdown time loaded from EEPROM: ") << ee << endl;
   }
 
-  // Delay some more for no real reason
-  delay(1000);
-
   // Tell the world we're all set
   DMXInterface::debug << PSTR("Init complete") << endl;
+
+  // If we're using the button for other things,
+  // make sure we don't trigger them
+  if (Debug::Motor::TestWithButton || Debug::PinSpot::TestWithButton) {
+    while (Board::DebugButton::isActive());
+
+    delay(20);
+  }
 
   // Turn off led to indicate end of init
   DebugLED::off();
