@@ -32,6 +32,8 @@ void Motor::setup() {
   stepper1.setAcceleration(maxPulsesPerSecSec);
 }
 
+unsigned long homeStartedAt;
+
 void Motor::home() {
   state = State::Homing;
 
@@ -45,6 +47,7 @@ void Motor::home() {
   }
 
   digitalWrite(Board::EnablePin, HIGH);
+  homeStartedAt = millis();
   DMXInterface::debug << PSTR("Homing") << endl;
 
   delay(100);
@@ -54,13 +57,6 @@ void Motor::home() {
 
     Board::DebugLED::on();
   }
-  
-  delay(25 * 1000);
-  
-  state = State::Normal;
-  stepper1.setCurrentPosition(0);
-  stepper1.enableOutputs();
-  DMXInterface::debug << PSTR("Homed") << endl;
 }
 
 void Motor::printPositionIfChanged() {
@@ -78,6 +74,16 @@ void Motor::printPositionIfChanged() {
 }
 
 void Motor::loop() {
+
+  if (state == State::Homing) {
+    if (millis() - homeStartedAt > 25000) {
+      state = State::Normal;
+      stepper1.setCurrentPosition(0);
+      stepper1.enableOutputs();
+      DMXInterface::debug << PSTR("Homed") << endl;
+    }
+    return;
+  }
   
   stepper1.run();
   printPositionIfChanged();
