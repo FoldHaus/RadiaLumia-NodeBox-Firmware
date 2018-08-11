@@ -1,4 +1,8 @@
 
+/**
+ * This file contains all of the things that might change if the board design changes
+ */
+
 #ifndef BOARD_H
 #define BOARD_H
 
@@ -9,6 +13,8 @@ namespace Foldhaus {
 namespace Board {
 
   using namespace AVR;
+
+  // To use IOpin (Input & Output), I like keeping them as "types"
 
   using DebugLED = Output<Ports::D, 2, false, false>;
 

@@ -1,3 +1,7 @@
+/**
+ * Flags for enabling certain built-in test modes and things
+ */
+
 #ifndef DEBUG_H
 #define DEBUG_H
 
