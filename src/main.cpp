@@ -49,7 +49,7 @@ bool handleMessage() {
   // DebugLED::on();
 
   const auto command = msg->getCommand();
-  unsigned long position = msg->getMotor();
+  const unsigned long position = msg->getMotor();
 
   if (Debug::DMX::Messages) {
     DMXInterface::debug
