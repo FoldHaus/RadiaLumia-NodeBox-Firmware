@@ -57,10 +57,10 @@ void setup() {
 
   if (reset || ee > shutdownPosMax) {
     eeprom_write_word(&shutdownPosEE, shutdownPos = shutdownPosDefault);
-    DMXInterface::debug << PSTR("Close on timeout set to default") << endl;
+    DMXInterface::debug << PSTR("Shutdown Position set to default") << endl;
   } else {
     shutdownPos = ee;
-    DMXInterface::debug << PSTR("Close on timeout loaded from EEPROM: ") << ee << endl;
+    DMXInterface::debug << PSTR("Shutdown Position loaded from EEPROM: ") << ee << endl;
   }
 
   ee = eeprom_read_word(&shutdownTimeEE);
@@ -77,10 +77,10 @@ void setup() {
 
   if (reset || ee == 0xff) {
     eeprom_write_byte(&disableMotorOnShutdownEE, disableMotorOnShutdown = disableMotorOnShutdownDefault);
-    DMXInterface::debug << PSTR("Shutdown time set to default") << endl;
+    DMXInterface::debug << PSTR("Disable Motor on Shutdown set to default") << endl;
   } else {
     disableMotorOnShutdown = ee;
-    DMXInterface::debug << PSTR("Shutdown time loaded from EEPROM: ") << ee << endl;
+    DMXInterface::debug << PSTR("Disable Motor on Shutdown loaded from EEPROM: ") << ee << endl;
   }
 
   // Tell the world we're all set
