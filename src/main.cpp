@@ -138,9 +138,9 @@ bool handleMessage() {
 
   if (Debug::DMX::Messages) {
     DMXInterface::debug
-      << PSTR("\tPSpot: ")
+      << PSTR("PSpot: ")
       << PinSpot::handleNewBrightness(msg->getPinspot())
-      << PSTR("Command: ")
+      << PSTR("\tCommand: ")
       << command
       << PSTR("\tMotor: ")
       << position
