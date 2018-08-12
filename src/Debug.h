@@ -16,7 +16,7 @@ namespace Debug {
   }
 
   namespace PinSpot {
-    constexpr bool TestWithButton = true;
+    constexpr bool TestWithButton = false;
   }
 }
 }
