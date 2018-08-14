@@ -8,7 +8,7 @@
 namespace FoldHaus {
 namespace Debug {
   namespace DMX {
-    constexpr bool Messages = true;
+    constexpr bool Messages = false;
     constexpr bool CRC = false;
   }
   namespace Motor {
