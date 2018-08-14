@@ -11,6 +11,9 @@
 using namespace FoldHaus;
 using namespace Motor;
 
+// 0 == off
+constexpr unsigned long homeAfterFaultDelay = 5000;
+
 uint16_t EEMEM maxPulsesEE = defaultMaxPulses;
 uint16_t EEMEM maxPulsesPerSecondEE = defaultMaxPulsesPerSecond;
 uint16_t EEMEM maxPulsesPerSecSecEE = defaultMaxPulsesPerSecSec;
@@ -32,6 +35,7 @@ enum class State : u1 {
   Init,
   Homing,
   Normal,
+  Fault,
 };
 
 State state = State::Init;
@@ -171,10 +175,11 @@ uint8_t Motor::updateHomeOnMessage(const bool hom) {
 
 uint8_t Motor::home(bool verbose) {
   if (state == State::Homing) return 1;
-
-  uint8_t err = 0;
+  
+  Board::DebugLED::off();
 
   state = State::Homing;
+  homeStartedAt = millis();
 
   digitalWrite(Board::EnablePin, LOW);
   
@@ -184,12 +189,12 @@ uint8_t Motor::home(bool verbose) {
     if (verbose) {
       DMXInterface::debug << PSTR("Short on HLFB or motor missconfigured") << endl;
     }
-    err = 2;
     Board::DebugLED::on();
+    state = State::Fault;
+    return 2;
   }
 
   digitalWrite(Board::EnablePin, HIGH);
-  homeStartedAt = millis();
   if (verbose) {
     DMXInterface::debug << PSTR("Homing") << endl;
   }
@@ -200,11 +205,13 @@ uint8_t Motor::home(bool verbose) {
     if (verbose) {
       DMXInterface::debug << PSTR("No Motor Present") << endl;
     }
-    err = 3;
     Board::DebugLED::on();
+    state = State::Fault;
+    digitalWrite(Board::EnablePin, LOW);
+    return 3;
   }
 
-  return err;
+  return 0;
 }
 
 void Motor::printPositionIfChanged() {
@@ -246,6 +253,7 @@ void Motor::loop() {
   if (state == State::Normal && !Board::Feedback::isActive()) {
     disable();
     DMXInterface::debug << PSTR("Fault! At: ") << stepper1.currentPosition() << endl;
+    state = State::Fault;
     delay(3000);
   }
   
@@ -255,7 +263,7 @@ void Motor::loop() {
   if (Debug::Motor::TestWithButton) {
 
     if (Board::DebugButton::isActive()) {
-      if (state == State::Init) {
+      if (state == State::Init || state == State::Fault) {
         home();
       }
       else
@@ -301,7 +309,7 @@ void Motor::selfTest() {
 long Motor::handleNewPosition(uint16_t position, bool allowHomeOnMessage) {
 
   // Home when we get any position message but are not already homed.
-  if (allowHomeOnMessage && homeOnMessage && state == State::Init) {
+  if (allowHomeOnMessage && homeOnMessage && (state == State::Init || (homeAfterFaultDelay && state == State::Fault && (millis() - homeStartedAt >= homeAfterFaultDelay)))) {
     home();
     return 0;
   }
