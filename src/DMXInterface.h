@@ -10,6 +10,9 @@
 #include <CRC8.h>
 #include <DecPrintFormatter.h>
 
+#include "Debug.h"
+#include "util.h"
+
 ISR(USART_RX_vect);
 
 namespace FoldHaus {
@@ -82,10 +85,18 @@ public:
 
     incoming.reserveNewestBufferForReading();
 
-    // HACK: This line make sure the CRC is 0xAA
-    return incoming.getReadBuffer()->raw[sizeof(DMXDataShape)] == 0xAA;
+    const auto msg = incoming.getReadBuffer();
+    const auto crc = msg->checkCRC();
 
-    return (incoming.getReadBuffer()->checkCRC() == 0);
+    if (Debug::DMX::CRC) {
+      if (crc) {
+        DMXInterface::debug << PSTR("Computed CRC: ") << crc << endl;
+      } else {
+        DMXInterface::debug << PSTR("CRC pass!") << endl;
+      }
+    }
+
+    return crc == 0;
   }
 
   inline static Message const * getMessage() {
