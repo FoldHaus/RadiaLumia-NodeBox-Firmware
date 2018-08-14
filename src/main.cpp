@@ -30,13 +30,13 @@ using namespace Board;
 // const char endl[] PROGMEM = "\r\n";
 
 void setup() {
+  delay(300);
   // Initialize blip on LED
   DebugLED::on();
 
   // To make sure things have time to settle,
-  // especially the button for EEPROM reset reasons and
-  // to let the LED be ON for a second
-  delay(1000);
+  // especially the button for EEPROM reset reasons
+  delay(300);
 
   // Enable the external RS485 hardware before enabling serial interface
   pinMode(RS485RxEnable, OUTPUT);
