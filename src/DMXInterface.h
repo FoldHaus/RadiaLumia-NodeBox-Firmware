@@ -39,14 +39,19 @@ public:
     using crc = CRC8;
     friend class DMXInterface;
 
+    static constexpr uint8_t MARKER = 0xAA;
+
     /**
      * fix length of message, including crc
      */
-    static constexpr size_t length = sizeof(DMXDataShape) + sizeof(crc);
+    static constexpr size_t length = sizeof(MARKER) + sizeof(DMXDataShape) + sizeof(crc);
 
     union {
       uint8_t raw[length];
-      DMXDataShape data;
+      struct {
+        uint8_t marker;
+        DMXDataShape data;
+      };
     };
 
     /**
@@ -60,6 +65,10 @@ public:
      * Returns the CRC8 of the full message. A value other than 0 means CRC failed.
      */
     uint8_t checkCRC();
+
+    inline bool hasValidMarker() {
+      return marker == MARKER;
+    }
 
     inline typeof(data.command) getCommand() const {
       return data.command;
@@ -96,7 +105,9 @@ public:
       }
     }
 
-    return crc == 0;
+    const bool markerValid = msg->hasValidMarker();
+
+    return markerValid && crc == 0;
   }
 
   inline static Message const * getMessage() {
