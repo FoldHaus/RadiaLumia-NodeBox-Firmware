@@ -86,6 +86,15 @@ void setup() {
   // Tell the world we're all set
   DMXInterface::debug << PSTR("Init complete") << endl;
 
+  if (reset) {
+    for (u1 i = 0; i < 5; i++) {
+      Board::DebugLED::off();
+      delay(100);
+      Board::DebugLED::on();
+      delay(10);
+    }
+  }
+
   // If we're using the button for other things,
   // make sure we don't trigger them
   if (Debug::Motor::TestWithButton || Debug::PinSpot::TestWithButton) {
