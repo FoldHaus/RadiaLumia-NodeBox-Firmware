@@ -24,6 +24,7 @@ bool disableMotorOnShutdown;
 constexpr uint16_t disableMotorOnShutdownDefault = false;
 uint8_t EEMEM disableMotorOnShutdownEE = disableMotorOnShutdownDefault;
 
+constexpr bool FirstRunAndPinSpotTest = false;
 
 using namespace Board;
 
@@ -50,7 +51,7 @@ void setup() {
 
   PinSpot::setup();
 
-  const bool reset = Board::DebugButton::isActive();
+  const bool reset = FirstRunAndPinSpotTest || Board::DebugButton::isActive();
   
   Motor::setup(reset);
 
@@ -94,6 +95,11 @@ void setup() {
       Board::DebugLED::on();
       delay(10);
     }
+  }
+
+  if (FirstRunAndPinSpotTest) {
+    PinSpot::handleNewBrightness(255);
+    while (1);
   }
 
   // If we're using the button for other things,
