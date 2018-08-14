@@ -57,7 +57,7 @@ constexpr bool homeOnMessageDefault = true;
 extern uint16_t autoHomeDelay;
 constexpr uint16_t autoHomeDelayDefault = 0;
 
-void setup();
+void setup(bool resetEEPROM);
 /**
  * Home unless already homing.
  * 

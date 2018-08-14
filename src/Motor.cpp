@@ -45,19 +45,16 @@ AccelStepper stepper1(AccelStepper::DRIVER, Board::StepPin, Board::DirectionPin,
 
 unsigned long homeStartedAt;
 
-void Motor::setup() {
+void Motor::setup(bool resetEEPROM) {
   digitalWrite(Board::EnablePin, LOW);
   pinMode(Board::EnablePin, OUTPUT);
 
   stepper1.setPinsInverted(true, false, false);
   stepper1.setOverstepCount(overstep);
 
-  // Force clear with button held on startup
-  bool reset = Board::DebugButton::isActive();
-
   auto ee = eeprom_read_word(&maxPulsesEE);
 
-  if (reset || ee > absoluteMaxPulses) {
+  if (resetEEPROM || ee > absoluteMaxPulses) {
     eeprom_write_word(&maxPulsesEE, maxPulses = defaultMaxPulses);
     DMXInterface::debug << PSTR("Pulse limit set to default") << endl;
   } else {
@@ -67,7 +64,7 @@ void Motor::setup() {
 
   ee = eeprom_read_word(&maxPulsesPerSecondEE);
 
-  if (reset || ee > absoluteMaxPulsesPerSecond) {
+  if (resetEEPROM || ee > absoluteMaxPulsesPerSecond) {
     eeprom_write_word(&maxPulsesPerSecondEE, maxPulsesPerSecond = defaultMaxPulsesPerSecond);
     DMXInterface::debug << PSTR("PulsePerSec limit set to default") << endl;
   } else {
@@ -78,7 +75,7 @@ void Motor::setup() {
 
   ee = eeprom_read_word(&maxPulsesPerSecSecEE);
 
-  if (reset || ee > absoluteMaxPulsesPerSecSec) {
+  if (resetEEPROM || ee > absoluteMaxPulsesPerSecSec) {
     eeprom_write_word(&maxPulsesPerSecSecEE, maxPulsesPerSecSec = defaultMaxPulsesPerSecSec);
     DMXInterface::debug << PSTR("PulsePerSecSec limit set to default") << endl;
   } else {
@@ -89,7 +86,7 @@ void Motor::setup() {
 
   ee = eeprom_read_word(&maxHomingTimeMillisEE);
 
-  if (reset || ee > absoluteMaxHomingTimeMillis) {
+  if (resetEEPROM || ee > absoluteMaxHomingTimeMillis) {
     eeprom_write_word(&maxHomingTimeMillisEE, maxHomingTimeMillis = defaultMaxHomingTimeMillis);
     DMXInterface::debug << PSTR("Homing time limit set to default") << endl;
   } else {
@@ -99,7 +96,7 @@ void Motor::setup() {
 
   ee = eeprom_read_byte(&homeOnMessageEE);
 
-  if (reset) {
+  if (resetEEPROM) {
     eeprom_write_byte(&homeOnMessageEE, homeOnMessage = homeOnMessageDefault);
     DMXInterface::debug << PSTR("Homing on message set to default") << endl;
   } else {
@@ -109,7 +106,7 @@ void Motor::setup() {
 
   ee = eeprom_read_word(&autoHomeDelayEE);
 
-  if (reset) {
+  if (resetEEPROM) {
     eeprom_write_word(&autoHomeDelayEE, autoHomeDelay = autoHomeDelayDefault);
     DMXInterface::debug << PSTR("Autohoming set to default") << endl;
   } else {

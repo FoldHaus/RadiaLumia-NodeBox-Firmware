@@ -49,11 +49,12 @@ void setup() {
   DMXInterface::debug << PSTR("Setup") << endl;
 
   PinSpot::setup();
+
+  const bool reset = Board::DebugButton::isActive();
   
-  Motor::setup();
+  Motor::setup(reset);
 
   auto ee = eeprom_read_word(&shutdownPosEE);
-  const bool reset = Board::DebugButton::isActive();
 
   if (reset || ee > shutdownPosMax) {
     eeprom_write_word(&shutdownPosEE, shutdownPos = shutdownPosDefault);
