@@ -2,6 +2,8 @@
 
 title FoldHaus Mass programmer
 
+set COMPORT=COM13
+
 set FIRMWARE=.pioenvs\pro16MHzatmega328\firmware.hex
 set ROOT=%~dp0..
 
@@ -24,7 +26,7 @@ if errorlevel 1 (
     exit
 )
 
-SET PROG="avrdude" -pm328p -carduino -PCOM8 -b57600
+SET PROG="avrdude" -pm328p -carduino -P%COMPORT% -b57600
 
 :StartLoop
 
