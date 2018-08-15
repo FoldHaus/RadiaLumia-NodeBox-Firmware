@@ -12,11 +12,11 @@ set MAINHEX=%ROOT%\\%FIRMWARE:~0,-3%main.hex
 
 SET PLATFORMIO_BUILD_FLAGS='-DFirstRunAndPinSpotTest=true'
 platformio.exe run --silent
-move %ROOT%/%FIRMWARE% %SETUPHEX%
+move %ROOT%/%FIRMWARE% %SETUPHEX% > nul
 
 SET PLATFORMIO_BUILD_FLAGS='-DFirstRunAndPinSpotTest=false'
 platformio.exe run --silent
-move %ROOT%/%FIRMWARE% %MAINHEX%
+move %ROOT%/%FIRMWARE% %MAINHEX% > nul
 
 fc /b %MAINHEX% %SETUPHEX% > nul
 if errorlevel 1 (
