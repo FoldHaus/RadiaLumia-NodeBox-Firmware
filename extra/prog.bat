@@ -35,6 +35,8 @@ echo Programming test & setup firmware
 
 %PROG% -e -Uflash:w:"%SETUPHEX%":a || goto ErrorTryAgain
 
+echo Testing PinSpot...
+
 REM Sleep for 10 seconds to test LED.
 REM Use timeout so that any key press will start next step in case of failure.
 timeout 10 > nul
