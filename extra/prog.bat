@@ -16,9 +16,15 @@ SET PLATFORMIO_BUILD_FLAGS='-DFirstRunAndPinSpotTest=false'
 platformio.exe run --silent
 move %ROOT%/%FIRMWARE% %MAINHEX%
 
-SET PROG="avrdude" -pm328p -carduino -PCOM8 -b57600
+fc /b %MAINHEX% %SETUPHEX% > nul
+if errorlevel 1 (
+    echo Let's get this programming party started!
+) else (
+    echo Built files are the same. This is wrong
+    exit
+)
 
-echo Let's get this programming party started!
+SET PROG="avrdude" -pm328p -carduino -PCOM8 -b57600
 
 :StartLoop
 
