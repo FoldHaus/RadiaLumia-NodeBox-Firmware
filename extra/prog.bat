@@ -28,29 +28,29 @@ SET PROG="avrdude" -pm328p -carduino -PCOM8 -b57600
 
 :StartLoop
 
-%PROG% -lnul || goto StartLoop
+echo Press any key when connected
+timeout -1 > nul
 
-echo Programming new device with setup firmware and PinSpot test
+echo Programming test & setup firmware
 
-%PROG% -e -Uflash:w:"%SETUPHEX%":a || goto StartLoop
+%PROG% -e -Uflash:w:"%SETUPHEX%":a || goto ErrorTryAgain
 
 REM Sleep for 10 seconds to test LED.
 REM Use timeout so that any key press will start next step in case of failure.
 timeout 10 > nul
 
-echo Programming main run firmware
-%PROG% -D -U flash:w:"%MAINHEX%":a || goto StartLoop
+echo Programming main firmware
+%PROG% -D -U flash:w:"%MAINHEX%":a || goto ErrorTryAgain
 
 
-echo Done. Waiting for device to be unplugged.
+echo Done.
 
 sleep 4
 
-:DoneLoop
-%PROG% -lnul && goto DoneLoop
+goto StartLoop
 
-echo Device unplugged. Waiting for next device.
+:ErrorTryAgain
 
-sleep 1
+echo Error. Please try again.
 
 goto StartLoop
