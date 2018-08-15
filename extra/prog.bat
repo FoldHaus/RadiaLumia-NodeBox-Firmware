@@ -33,7 +33,7 @@ SET PROG="avrdude" -pm328p -carduino -P%COMPORT% -b57600
 echo Press any key when connected
 timeout -1 > nul
 
-echo Programming test & setup firmware
+echo Programming test and setup firmware
 
 %PROG% -e -Uflash:w:"%SETUPHEX%":a || goto ErrorTryAgain
 
