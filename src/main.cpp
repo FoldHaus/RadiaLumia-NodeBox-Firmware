@@ -24,7 +24,10 @@ bool disableMotorOnShutdown;
 constexpr uint16_t disableMotorOnShutdownDefault = false;
 uint8_t EEMEM disableMotorOnShutdownEE = disableMotorOnShutdownDefault;
 
-constexpr bool FirstRunAndPinSpotTest = false;
+#ifndef FirstRunAndPinSpotTest
+#error FirstRunAndPinSpotTest MUST be defined
+#endif
+
 
 using namespace Board;
 
